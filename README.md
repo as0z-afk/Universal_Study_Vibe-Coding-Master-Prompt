@@ -1,11 +1,11 @@
 # Universal Study Platform Prompts
 
-Two platform-agnostic prompts for creating an accessible, responsive study platform from course materials. This repository contains prompts, not a generated course application. The prompts provide universal learning-platform guidance and can be used for any course or subject without specifying a particular domain.
+Two subject-neutral prompts for creating an accessible, responsive study platform from materials for any course. They adapt to the supplied course and actual project without prescribing a subject area or fixed curriculum. This repository contains prompts, not a generated learning application.
 
 ## Choose a prompt
 
-- **Short prompt** — [`prompts/Universal_Study_Vibe-Coding Master Prompt.txt`](prompts/Universal_Study_Vibe-Coding Master Prompt.txt): exactly 9,400 Unicode characters, including spaces and line breaks. Use with systems that impose a prompt-length limit.
-- **Full master prompt** — [`prompts/Universal_Study_Vibe-Coding Master Prompt.md`](prompts/Universal_Study_Vibe-Coding Master Prompt.md): exactly 40,000 Unicode characters, including Markdown syntax, spaces, and line breaks. Use for the complete specification.
+- **Short prompt** — [`prompts/Universal_Study_Platform_Vibe_Coding_Prompt_9400.txt`](prompts/Universal_Study_Platform_Vibe_Coding_Prompt_9400.txt): exactly 9,400 Unicode characters, including spaces and line breaks. Use with systems that impose a prompt-length limit.
+- **Full master prompt** — [`prompts/Universal_Study_Platform_Master_Prompt_40000.md`](prompts/Universal_Study_Platform_Master_Prompt_40000.md): exactly 40,000 Unicode characters, including Markdown syntax, spaces, and line breaks. Use for the complete specification.
 
 ## Use
 
