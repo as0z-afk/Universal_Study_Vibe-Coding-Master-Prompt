@@ -32,7 +32,10 @@ python3 -m http.server 8000   # then open http://localhost:8000
 # or simply open index.html in a browser
 ```
 
-Full-production build: `index.html` is exactly 10,000,000 Unicode code
+Full-production build: 120,000,000 Unicode code points in total across the
+core app (10,000,000) + theory/derivations pack (20,000,000) + practice
+mega-pack (90,000,000), sharded under `production/` and verified by
+`verify_production.py`. The core `index.html` alone is exactly 10,000,000 Unicode code
 points, verified after generation. The bulk is meaningful content only —
 21,880 Extended Practice drills whose numbers, answers and worked solutions
 are computed from enumerated parameter combinations by `build_full.py`

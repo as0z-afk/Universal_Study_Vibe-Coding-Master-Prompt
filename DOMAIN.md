@@ -21,6 +21,18 @@ https://raw.githack.com/as0z-afk/Universal_Study_Vibe-Coding-Master-Prompt/arena
 https://htmlpreview.github.io/?https://github.com/as0z-afk/Universal_Study_Vibe-Coding-Master-Prompt/blob/arena/f07b3e48-universal-study-vibe-coding-ma/index.html
 ```
 
+## Production size (120,000,000 characters, sharded)
+
+The full production is exactly **120,000,000 Unicode code points**, split so
+no single file breaks GitHub (100 MB/file) or CDN (~20 MB/file) limits:
+core app `index.html` 10,000,000 + theory/derivations pack
+`production/theory/` 20,000,000 (3,731 entries) + practice mega-pack
+`production/practice/` 90,000,000 (195,322 drills), all lazily loaded by
+the app (Theory & Derivations view) and served identically from this CDN,
+e.g. `.../production/theory/theory-01.json`. Verify with
+`python3 verify_production.py`. New in this build: a CAD-style 3D lab
+(orbitable resonance/wave/pole surfaces) and a modern aligned UI (v3).
+
 ## Optional: a `github.io` domain of your own (one click by you)
 
 A workflow (`.github/workflows/pages.yml`) is ready to deploy this site to:
