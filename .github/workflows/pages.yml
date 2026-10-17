@@ -1,8 +1,6 @@
 name: Deploy ETE225 Study Hub to GitHub Pages
 
 on:
-  push:
-    branches: ["arena/f07b3e48-universal-study-vibe-coding-ma"]
   workflow_dispatch:
 
 permissions:

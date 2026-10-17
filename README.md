@@ -7,12 +7,14 @@ Two subject-neutral prompts for creating an accessible, responsive study platfor
 - **Short prompt** — [`prompts/Universal_Study_Platform_Vibe_Coding_Prompt_9400.txt`](prompts/Universal_Study_Platform_Vibe_Coding_Prompt_9400.txt): exactly 9,400 Unicode characters, including spaces and line breaks. Use with systems that impose a prompt-length limit.
 - **Full master prompt** — [`prompts/Universal_Study_Platform_Master_Prompt_40000.md`](prompts/Universal_Study_Platform_Master_Prompt_40000.md): exactly 40,000 Unicode characters, including Markdown syntax, spaces, and line breaks. Use for the complete specification.
 
-## Virtual domain — signals-communication
+## Shareable domain — signals-communication
 
-The hub is assigned the virtual domain name **signals-communication** on the
-Arena preview domain: `https://8000-<sandbox-id>.e2b.app/signals-communication/`
-(plus a `signals-communication.local` alias for local use). Full details,
-sharing notes, and permanent-domain options: see [`DOMAIN.md`](DOMAIN.md).
+**Public address (works from anywhere, no account):**
+`https://cdn.jsdelivr.net/gh/as0z-afk/Universal_Study_Vibe-Coding-Master-Prompt@arena/f07b3e48-universal-study-vibe-coding-ma/index.html`
+— served by the jsDelivr CDN from this public repo. The Arena preview
+address (`https://8000-<sandbox-id>.e2b.app/signals-communication/`) remains
+for development, and an optional one-click `github.io` deployment is
+prepared. Full details and backup addresses: see [`DOMAIN.md`](DOMAIN.md).
 
 ## Generated study app — ETE225
 
