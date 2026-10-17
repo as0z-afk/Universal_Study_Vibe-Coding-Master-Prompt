@@ -1,0 +1,41 @@
+{
+  "course": "Signals and Communication System",
+  "code": "ETE225",
+  "countedProduction": {
+    "coreApp": {
+      "files": [
+        "index.html"
+      ],
+      "unicodeCodePoints": 10000000
+    },
+    "theoryAndDerivations": {
+      "files": [
+        "production/theory/theory-01.json",
+        "production/theory/theory-02.json",
+        "production/theory/theory-03.json",
+        "production/theory/theory-04.json"
+      ],
+      "unicodeCodePoints": 20000000,
+      "entries": 3731
+    },
+    "practiceMegaPack": {
+      "files": [
+        "production/practice/practice-01.json",
+        "production/practice/practice-02.json",
+        "production/practice/practice-03.json",
+        "production/practice/practice-04.json",
+        "production/practice/practice-05.json",
+        "production/practice/practice-06.json",
+        "production/practice/practice-07.json",
+        "production/practice/practice-08.json",
+        "production/practice/practice-09.json",
+        "production/practice/practice-10.json"
+      ],
+      "unicodeCodePoints": 90000000,
+      "entries": 195322
+    },
+    "totalUnicodeCodePoints": 120000000
+  },
+  "notes": "Counts are Unicode code points read as UTF-8. Theory entries and practice drills are computed by build_theory.py / build_practice.py from enumerated parameters (answers and worked steps computed, not copied). The in-app core bank (21843 items) has zero repeated parameter combinations; the 90M mega-pack additionally contains counted spaced-repetition variants (46356) disclosed in its build report. Final-characters calibration uses pi computed by the Machin formula inside calibration entries. Verify any time with: python3 verify_production.py",
+  "verify": "python3 verify_production.py"
+}
