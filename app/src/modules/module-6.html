@@ -1,0 +1,197 @@
+<article class="module-page" id="module-6" data-module="6" data-title="Laplace Transform and Continuous-Time Systems" data-promise="Use the Laplace transform and pole locations to predict transient shape, damping and stability without solving the ODE." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 6</span>
+      <span class="pill">s-domain</span>
+      <span class="pill">6 concepts</span>
+    </div>
+    <h1>Laplace Transform and Continuous-Time Systems</h1>
+    <p class="promise">The Laplace transform turns differential equations into algebra and draws a system's entire personality on one complex plane. Poles tell you how fast it responds, whether it rings and whether it survives.</p>
+    <ul class="outcomes">
+      <li>Transform and invert the standard signals and explain the role of the region of convergence.</li>
+      <li>Use the initial- and final-value theorems as checks on a solution.</li>
+      <li>Resolve a rational transform into partial fractions and invert it.</li>
+      <li>Read damping, natural frequency and stability from pole locations.</li>
+      <li>Compute a transfer function from a circuit or an ODE and use it to predict the step response.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>Two circuits have the same DC gain and the same cutoff frequency. One overshoots its step response by 20%; the other never overshoots at all. Their transfer functions differ in only one number. Which number is it, and where does it sit on the s-plane?</p>
+      <p>Section 6.5 answers this by reading the poles. By section 6.6 you will predict the overshoot before plotting anything.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m6-s1">
+        <h2>6.1 From the Fourier axis to the whole plane</h2>
+        <div class="prose">
+          <p>The Fourier transform evaluates a signal against everlasting sinusoids <span class="mono">e<sup>jωt</sup></span>. Many useful signals — a growing exponential, a step that never ends, an unstable oscillator — do not have a Fourier transform in the ordinary sense. The Laplace transform fixes this by allowing the test exponential to grow or decay:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Two-sided Laplace transform</span><span class="tag">CORE</span></div>
+              <div class="math">X(s) = ∫<sub>−∞</sub><sup>∞</sup> x(t)e<sup>−st</sup>dt, &nbsp; s = σ + jω</div>
+              <ul class="fx-symbols">
+                <li><b>σ</b> the real part, controlling growth or decay</li>
+                <li><b>ω</b> the imaginary part, controlling oscillation</li>
+                <li><b>s</b> a complex frequency</li>
+              </ul>
+              <p class="fx-note">Setting σ = 0 recovers the Fourier transform along the imaginary axis. The Laplace transform is therefore a Fourier transform evaluated on a vertical line, extended over the whole plane.</p>
+            </div>
+          </div>
+          <p>The price of the extension is the <strong>region of convergence</strong> (ROC): the set of s values for which the integral converges. A transform without its ROC is incomplete, because the same algebraic expression can correspond to different time signals depending on which side of the poles the ROC lies.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m6-s2">
+        <h2>6.2 The pairs and properties you will actually use</h2>
+        <div class="prose">
+          <p>Most transform work is pattern matching plus four properties. Learn the short table and the properties, and the rest follows.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Standard Laplace pairs and regions of convergence</caption>
+            <thead><tr><th>x(t), causal</th><th>X(s)</th><th>ROC</th></tr></thead>
+            <tbody>
+              <tr><td>δ(t)</td><td>1</td><td>All s</td></tr>
+              <tr><td>u(t)</td><td>1/s</td><td>Re(s) &gt; 0</td></tr>
+              <tr><td>t u(t)</td><td>1/s²</td><td>Re(s) &gt; 0</td></tr>
+              <tr><td>e<sup>−at</sup>u(t)</td><td>1/(s + a)</td><td>Re(s) &gt; −a</td></tr>
+              <tr><td>sin(ω₀t)u(t)</td><td>ω₀/(s² + ω₀²)</td><td>Re(s) &gt; 0</td></tr>
+              <tr><td>cos(ω₀t)u(t)</td><td>s/(s² + ω₀²)</td><td>Re(s) &gt; 0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Differentiation multiplies by s and subtracts initial conditions. Integration divides by s. A time delay multiplies by <span class="mono">e<sup>−sT</sup></span>. Convolution becomes multiplication. These four rules convert a linear differential equation with constant coefficients into an algebraic equation in s, which is the entire reason the transform is taught.</p>
+        <div class="callout">
+          <div class="co-icon">∫</div>
+          <div><h4>Initial and final value theorems are checks, not shortcuts</h4>
+          <p>The initial-value theorem states <span class="mono">f(0⁺) = lim<sub>s→∞</sub> sF(s)</span>. The final-value theorem states <span class="mono">f(∞) = lim<sub>s→0</sub> sF(s)</span>, but only if every pole of <span class="mono">sF(s)</span> is in the left half-plane. Applying the final-value theorem to an unstable system returns a finite number that has nothing to do with the actual response. Check stability first.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m6-s3">
+        <h2>6.3 Reading the region of convergence</h2>
+        <div class="prose">
+          <p>The ROC is a vertical strip or half-plane in the s-plane. For a right-sided signal it lies to the right of the rightmost pole; for a left-sided signal, to the left of the leftmost pole; for a two-sided signal, in the strip between two poles. The boundaries are always vertical lines through the poles, because convergence depends only on the real part σ.</p>
+          <p>Three consequences matter for systems:</p>
+          <ul class="tight">
+            <li><strong>Causality</strong> requires a right-sided ROC that extends to infinity.</li>
+            <li><strong>Stability</strong> requires the ROC to include the imaginary axis. If the jω axis is inside the ROC, the Fourier transform exists and every bounded input gives a bounded output.</li>
+            <li><strong>Causal and stable simultaneously</strong> requires every pole to lie strictly in the left half-plane.</li>
+          </ul>
+          <p>A pole exactly on the imaginary axis produces a sustained oscillation or a constant: the system is marginally stable, not stable. A double pole on the axis produces a growing ramp.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m6-s4">
+        <h2>6.4 Inverse transforms by partial fractions</h2>
+        <div class="prose">
+          <p>A rational transform with a higher-degree denominator can be split into first-order terms whose inverses are known. For distinct poles:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Partial-fraction expansion</span><span class="tag">METHOD</span></div>
+              <div class="math">F(s) = A₁/(s + p₁) + A₂/(s + p₂) + … &nbsp;⟹&nbsp; f(t) = Σ A<sub>k</sub>e<sup>−p<sub>k</sub>t</sup>u(t)</div>
+              <ul class="fx-symbols">
+                <li><b>A<sub>k</sub></b> the residue at pole p<sub>k</sub></li>
+                <li><b>p<sub>k</sub></b> a pole location</li>
+                <li><b>right-sided</b> the assumed ROC for a causal system</li>
+              </ul>
+              <p class="fx-note">Repeated poles produce terms t<sup>m</sup>e<sup>−pt</sup>. Complex poles produce damped sinusoids; pair the conjugates to avoid complex arithmetic in the final answer.</p>
+            </div>
+          </div>
+          <p>Residues are computed by covering the pole and evaluating the rest: for a simple pole at <span class="mono">s = −p<sub>k</sub></span>, multiply both sides by <span class="mono">(s + p<sub>k</sub>)</span> and set <span class="mono">s = −p<sub>k</sub></span>. The sum of the residues equals the coefficient of the highest-power term, which is a useful check when the numerator and denominator have the same degree.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 6.1</span><h4>Invert a second-order transform</h4></div>
+          <div class="example-body">
+            <p>Find <span class="mono">y(t)</span> for <span class="mono">Y(s) = 12/[(s + 1)(s + 3)]</span>, causal.</p>
+            <p><b>Split.</b> 12/[(s+1)(s+3)] = A/(s+1) + B/(s+3). Cover s = −1: A = 12/(−1+3) = 6. Cover s = −3: B = 12/(−3+1) = −6.</p>
+            <p><b>Invert.</b> y(t) = 6e<sup>−t</sup>u(t) − 6e<sup>−3t</sup>u(t).</p>
+            <p><b>Check.</b> y(0⁺) = 6 − 6 = 0, which matches the initial-value theorem: lim sY(s) as s→∞ = 0. y(∞) = 0, which matches the final-value theorem because both poles are in the left half-plane. The response rises, peaks, then decays as the slower exponential dominates.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m6-s5">
+        <h2>6.5 Poles, zeros and the shape of the response</h2>
+        <div class="prose">
+          <p>Write a transfer function in factored form, <span class="mono">H(s) = K(s − z₁)(s − z₂)…/[(s − p₁)(s − p₂)…]</span>. The poles <span class="mono">p<sub>k</sub></span> are the natural frequencies of the system; the zeros <span class="mono">z<sub>k</sub></span> are the frequencies at which the response is blocked.</p>
+          <p>A real pole at <span class="mono">s = −a</span> contributes a decaying exponential with time constant <span class="mono">1/a</span>. The farther left the pole, the faster the decay. A complex pair at <span class="mono">σ ± jω<sub>d</sub></span> contributes <span class="mono">e<sup>σt</sup>cos(ω<sub>d</sub>t + φ)</span>: the real part sets the decay envelope, the imaginary part sets the ringing frequency.</p>
+          <p>A zero near the imaginary axis can slow the rise or create overshoot by differentiating the response. A zero in the right half-plane produces inverse response: the output initially moves in the opposite direction before recovering. Such non-minimum-phase zeros are common in aircraft and chemical processes and are a genuine control challenge.</p>
+          <p>A pole at the origin is a pure integrator: a step input produces a ramp. A pole on the imaginary axis produces a sustained sinusoid. A pole in the right half-plane produces growth, which is why the right half-plane is the instability region.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 6.2</span><h4>Damping from a denominator</h4></div>
+          <div class="example-body">
+            <p>A second-order system has <span class="mono">H(s) = 25/(s² + 6s + 25)</span>. Find the natural frequency, the damping ratio, the damped frequency and the overshoot.</p>
+            <p><b>Standard form.</b> Compare with s² + 2ζω_n s + ω_n². Here ω_n² = 25, so ω_n = 5 rad/s; 2ζω_n = 6, so ζ = 6/10 = 0.6.</p>
+            <p><b>Damped frequency.</b> ω_d = ω_n√(1 − ζ²) = 5√(1 − 0.36) = 5 × 0.8 = 4 rad/s.</p>
+            <p><b>Poles.</b> s = −3 ± j4. Both have negative real parts, so the system is stable.</p>
+            <p><b>Overshoot.</b> M_p = e<sup>−πζ/√(1−ζ²)</sup> = e<sup>−π(0.6)/0.8</sup> = e<sup>−2.356</sup> = 0.0946, about 9.5%. The step response settles to 1 with a ringing frequency of 4 rad/s.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m6-proj">
+        <h2>6.6 Watch the poles move</h2>
+        <div class="prose">
+          <p>The projection moves a pair of conjugate poles across the s-plane and shows the corresponding impulse and step responses. Drag the pole or use the presets to compare overdamped, critically damped and underdamped cases.</p>
+        </div>
+        <div class="projection" data-projection="laplace">
+          <noscript><div class="live-note"><b>Static version:</b> a real pole at −a gives a decaying exponential e<sup>−at</sup>. A complex pair σ ± jω_d gives a damped sinusoid. Poles on the imaginary axis oscillate forever; poles in the right half-plane grow.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m6-lab">
+        <h2>6.7 Lab — Pole–Zero Explorer</h2>
+        <div class="prose">
+          <p>Place poles and zeros, then compare the impulse response, the step response and the magnitude response. The lab integrates the system numerically and overlays the analytic prediction, so the pole movement and the waveform stay tied together.</p>
+        </div>
+        <div class="lab" data-lab="laplace"></div>
+      </section>
+
+      <section class="lesson-section" id="m6-simple">
+        <h2>6.8 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>The Laplace transform is a machine for turning calculus into algebra. A differential equation becomes a fraction in s. You simplify the fraction, look up the pieces in a table, and write down the time response.</p>
+          <p>The denominator's roots — the poles — tell you how the system behaves. A pole far to the left means a fast decay. A pole near the imaginary axis means slow decay or ringing. A pole on the right means the system is running away. A pair of poles above and below the axis means oscillation.</p>
+          <p>The zeros shape the response but do not create it. They can make a system overshoot or start in the wrong direction, but they do not decide stability. Stability is a property of the poles alone.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>For <span class="mono">H(s) = 1/(s + 2)</span>, the pole is at −2, the time constant is 0.5 s, and the step response is <span class="mono">½(1 − e<sup>−2t</sup>)</span>. At t = 0.5 s the response has reached 63% of its final value. That 63% point is the definition of one time constant.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>The Laplace transform is the eigenbasis of differentiation: <span class="mono">d/dt ↔ s</span>. That is why constant-coefficient ODEs become polynomials. The ROC exists because the eigenfunctions are not normalisable; the transform converges only where the exponential decay of e<sup>−σt</sup> beats the growth of the signal. In the z-domain the same story unfolds with <span class="mono">z = e<sup>sT</sup></span>, and the imaginary axis maps to the unit circle.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 6</h3>
+            <ul class="small">
+              <li><b>Pairs:</b> δ→1, u→1/s, t→1/s², e<sup>−at</sup>→1/(s+a), cos→s/(s²+ω²).</li>
+              <li><b>ROC:</b> right-sided → right of pole; stable → contains jω axis; causal + stable → all poles left.</li>
+              <li><b>Inverse:</b> partial fractions; residues at simple poles.</li>
+              <li><b>Second order:</b> ω_n from constant term; ζ from s coefficient; ω_d = ω_n√(1−ζ²).</li>
+              <li><b>Final value:</b> only valid when sF(s) has all poles in the left half-plane.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m6-check">
+        <h2>6.9 Checkpoint</h2>
+        <div class="prose"><p>Five questions from this module's Intermediate band. Answer before revealing the solution.</p></div>
+        <div class="checkpoint" data-checkpoint="6"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

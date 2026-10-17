@@ -1,0 +1,226 @@
+<article class="module-page" id="module-2" data-module="2" data-title="LTI Systems and Convolution" data-promise="Derive convolution from superposition, read it graphically, and use h(t) to predict an LTI system's response to anything." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 2</span>
+      <span class="pill">Linear systems</span>
+      <span class="pill">6 concepts</span>
+    </div>
+    <h1>LTI Systems and Convolution</h1>
+    <p class="promise">A linear time-invariant system is completely described by one signal: its impulse response. Once that signal is known, every other output can be computed by convolution. This module shows why, how to compute it, and how to read the answer on a graph.</p>
+    <ul class="outcomes">
+      <li>Explain why an LTI system is fully characterised by <span class="mono">h(t)</span> or <span class="mono">h[n]</span>.</li>
+      <li>Derive the convolution integral and the convolution sum from superposition and time-invariance.</li>
+      <li>Evaluate a convolution graphically, by integration and with the shifting property.</li>
+      <li>Use the area, width, commutativity and cascade rules to check an answer without redoing the algebra.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>A pulse enters a cable. At the far end it is no longer a pulse: it is longer, lower and asymmetric. The cable is linear and time-invariant. Could you predict the output of <em>any</em> input to that cable from a single measurement? If so, what measurement would you make?</p>
+      <p>By section 2.2 you will know the measurement — the impulse response — and the operation that turns it into an answer.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m2-s1">
+        <h2>2.1 The impulse response is the system's signature</h2>
+        <div class="prose">
+          <p>Feed the unit impulse <span class="mono">δ(t)</span> into a system and record the output. Call it <span class="mono">h(t)</span>. For an LTI system, that single function determines the response to every possible input. The reason is a three-step argument that you should be able to reproduce on an exam page: decompose the input into scaled, shifted impulses; use linearity to add the responses; use time-invariance to shift the same impulse response instead of measuring a new one.</p>
+          <p>An arbitrary input can be written as a superposition of impulses:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Sifting representation of a signal</span><span class="tag">DER</span></div>
+              <div class="math">x(t) = ∫<sub>−∞</sub><sup>∞</sup> x(τ) δ(t − τ) dτ</div>
+              <ul class="fx-symbols">
+                <li><b>τ</b> the integration variable, a time like any other</li>
+                <li><b>x(τ)</b> the weight (area) of the impulse at time τ</li>
+                <li><b>δ(t − τ)</b> an impulse located at t = τ</li>
+              </ul>
+              <p class="fx-note">This is not an approximation. The impulse picks out the value of x at t = τ, so the integral reconstructs x exactly. It is the continuous version of writing a vector as a sum of scaled basis vectors.</p>
+            </div>
+          </div>
+          <p>Apply the system operator <span class="mono">T</span> to both sides. Linearity lets the operator pass through the integral and the scaling by <span class="mono">x(τ)</span>. Time-invariance says that if <span class="mono">δ(t) → h(t)</span>, then <span class="mono">δ(t − τ) → h(t − τ)</span>. The result is the convolution integral.</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Convolution integral</span><span class="tag">CORE</span></div>
+              <div class="math">y(t) = x(t) * h(t) = ∫<sub>−∞</sub><sup>∞</sup> x(τ) h(t − τ) dτ</div>
+              <ul class="fx-symbols">
+                <li><b>x(t)</b> input signal</li>
+                <li><b>h(t)</b> impulse response</li>
+                <li><b>*</b> convolution, not multiplication</li>
+              </ul>
+              <p class="fx-note">The output at time t is a weighted average of the input, weighted by the reversed and shifted impulse response. The system "remembers" past inputs through the shape of h.</p>
+            </div>
+          </div>
+          <p>Nothing in the derivation required the system to be causal or stable. Those properties live in <span class="mono">h</span>: a causal system has <span class="mono">h(t) = 0</span> for <span class="mono">t &lt; 0</span>, and a BIBO-stable system has a finite absolute integral of <span class="mono">h</span>. The impulse response is therefore both a computational tool and a diagnostic summary.</p>
+        </div>
+
+        <div class="callout">
+          <div class="co-icon">Δ</div>
+          <div><h4>Discrete time is the same idea with a sum</h4>
+          <p>For discrete systems the decomposition uses unit pulses <span class="mono">δ[n − k]</span>, and the integral becomes a sum: <span class="mono">y[n] = Σ<sub>k</sub> x[k] h[n − k]</span>. The index k runs over all integers, but for causal signals it starts at 0. Every property, shortcut and graphical rule in this module has an exact discrete counterpart.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m2-s2">
+        <h2>2.2 Reading convolution as a sliding overlap</h2>
+        <div class="prose">
+          <p>The integral looks abstract until you draw it. For a fixed output time <span class="mono">t</span>, the integrand is the product of two functions of <span class="mono">τ</span>: the input <span class="mono">x(τ)</span> and a reversed, shifted copy <span class="mono">h(t − τ)</span>. The output is the area under that product. As <span class="mono">t</span> increases, the reversed copy slides to the right and the overlap changes.</p>
+          <p>Four steps make the graphical method reliable:</p>
+          <ol class="tight">
+            <li><b>Plot both functions against τ.</b> Keep <span class="mono">x(τ)</span> fixed; flip <span class="mono">h(τ)</span> to obtain <span class="mono">h(−τ)</span>.</li>
+            <li><b>Shift the flipped copy by t.</b> The function <span class="mono">h(t − τ)</span> is the flipped copy moved right by t.</li>
+            <li><b>Identify the overlap interval.</b> The product is zero outside the region where both functions are nonzero.</li>
+            <li><b>Integrate the product over that interval.</b> Record the result as one point of the output, then repeat for a different t.</li>
+          </ol>
+          <p>The overlap interval is the source of the support rule. If <span class="mono">x</span> is nonzero only on an interval of length <span class="mono">L<sub>x</sub></span> and <span class="mono">h</span> only on an interval of length <span class="mono">L<sub>h</sub></span>, the output is nonzero only while the two intervals intersect. For causal pulses starting at zero, the output starts at zero and ends at <span class="mono">L<sub>x</sub> + L<sub>h</sub></span>.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 2.1</span><h4>Two rectangular pulses</h4></div>
+          <div class="example-body">
+            <p>Let <span class="mono">x(t) = 2 rect(t/3)</span> and <span class="mono">h(t) = rect(t/2)</span>, both starting at <span class="mono">t = 0</span>. Find the peak of <span class="mono">y = x * h</span> and the length of its support.</p>
+            <p><b>Step 1 — identify the widths.</b> The input is 2 V high for 3 s; the impulse response is 1 high for 2 s. The narrower pulse sets how much overlap can accumulate.</p>
+            <p><b>Step 2 — build the overlap.</b> As the shifted pulse slides in, the overlap width grows linearly until it reaches <span class="mono">min(3, 2) = 2 s</span>, stays at 2 s while the shorter pulse is fully inside the longer one, then falls linearly to zero.</p>
+            <p><b>Step 3 — compute the peak.</b> Height × overlap width = <span class="mono">2 × 2 = 4</span>. So the convolution is a trapezoid with a flat top at 4 and total support <span class="mono">3 + 2 = 5 s</span>.</p>
+            <p><b>Step 4 — check with the area rule.</b> Area of <span class="mono">x</span> = 2×3 = 6; area of <span class="mono">h</span> = 1×2 = 2. Their product is 12. The trapezoid rises over 2 s, stays flat for 1 s and falls over 2 s, so its area is ½·2·4 + 1·4 + ½·2·4 = 12. The check agrees.</p>
+          </div>
+        </div>
+
+        <div class="callout trap">
+          <div class="co-icon">!</div>
+          <div><h4>Trap: convolution is not pointwise multiplication</h4>
+          <p>It is tempting to multiply <span class="mono">x(t)</span> by <span class="mono">h(t)</span> and plot the result. That operation is multiplication, not convolution, and it produces the wrong width, the wrong area and the wrong units. Convolution smears a signal by the impulse response; multiplication only scales it at each instant.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m2-s3">
+        <h2>2.3 Properties that let you check an answer</h2>
+        <div class="prose">
+          <p>Convolution is commutative, associative and distributive. These are not decorative facts: each one gives a shortcut or a consistency check.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Convolution properties and what they buy you</caption>
+            <thead><tr><th>Property</th><th>Statement</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td>Commutative</td><td><span class="mono">x * h = h * x</span></td><td>Convolve whichever function is simpler to flip.</td></tr>
+              <tr><td>Associative</td><td><span class="mono">(x * h₁) * h₂ = x * (h₁ * h₂)</span></td><td>Combine cascaded systems before applying the input.</td></tr>
+              <tr><td>Distributive</td><td><span class="mono">x * (h₁ + h₂) = x*h₁ + x*h₂</span></td><td>Split parallel paths and add the outputs.</td></tr>
+              <tr><td>Area</td><td><span class="mono">Area{y} = Area{x} · Area{h}</span></td><td>Check the scale of a computed output.</td></tr>
+              <tr><td>Shift</td><td><span class="mono">x(t−t₀) * h(t) = y(t−t₀)</span></td><td>Delays pass through convolution unchanged.</td></tr>
+              <tr><td>Width</td><td><span class="mono">L_y = L_x + L_h</span></td><td>Predict the support of a causal convolution.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The area rule follows from integrating both sides of the convolution integral. The width rule follows from the overlap picture. Both are fast sanity checks after a long integration, and both catch the two most common errors: a missing scale factor and a support interval that is too short.</p>
+      </section>
+
+      <section class="lesson-section" id="m2-s4">
+        <h2>2.4 Convolution with impulses and with steps</h2>
+        <div class="prose">
+          <p>Two special inputs cover a surprising number of exam questions. Convolution with a shifted impulse copies the signal:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Sifting by convolution</span><span class="tag">CORE</span></div>
+              <div class="math">x(t) * Aδ(t − t₀) = A x(t − t₀)</div>
+              <ul class="fx-symbols">
+                <li><b>A</b> the area of the impulse</li>
+                <li><b>t₀</b> the location of the impulse</li>
+                <li><b>x(t − t₀)</b> the input shifted to the right by t₀</li>
+              </ul>
+              <p class="fx-note">This is the identity element of convolution: δ(t) leaves a signal unchanged. It also explains why a system with h(t) = δ(t) is a perfect, distortionless channel.</p>
+            </div>
+          </div>
+          <p>Convolution with a unit step integrates the signal: <span class="mono">x(t) * u(t) = ∫<sub>−∞</sub><sup>t</sup> x(τ)dτ</span>. The step response is therefore the running integral of the impulse response, which is exactly how a first-order low-pass circuit behaves. Differentiating both sides recovers <span class="mono">h(t)</span> from the step response.</p>
+          <p>These two identities, plus linearity, let you convolve piecewise-constant signals almost without integration: decompose the signal into a sum of shifted steps or impulses, convolve each term, and add.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 2.2</span><h4>A pulse through a decaying channel</h4></div>
+          <div class="example-body">
+            <p>A channel has <span class="mono">h(t) = 3e<sup>−2t</sup>u(t)</span>. A 4 V pulse of width 1 s is applied. Find the output at the instant the pulse ends.</p>
+            <p><b>Set up the integral.</b> y(t) = ∫₀<sup>t</sup> 4 · 3e<sup>−2(t−τ)</sup> dτ for 0 ≤ t ≤ 1. The pulse is constant at 4 while the integration variable is inside it.</p>
+            <p><b>Integrate.</b> Pull out the constants: 12e<sup>−2t</sup> ∫₀<sup>t</sup>e<sup>2τ</sup>dτ = 12e<sup>−2t</sup> · (e<sup>2t</sup> − 1)/2 = 6(1 − e<sup>−2t</sup>).</p>
+            <p><b>Evaluate.</b> At t = 1: 6(1 − e<sup>−2</sup>) = 6(1 − 0.1353) = 5.19 V.</p>
+            <p><b>Check.</b> The final value of a step response would be 3 × 4/2 = 6 V. At 1 s the output has reached 86% of that, which is consistent with a time constant of 0.5 s (about two time constants). The support extends beyond t = 1 because the channel keeps discharging after the input ends.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m2-s5">
+        <h2>2.5 The convolution sum in discrete time</h2>
+        <div class="prose">
+          <p>For discrete-time signals the convolution sum is <span class="mono">y[n] = Σ<sub>k</sub> x[k]h[n−k]</span>. The mechanics mirror the continuous case: flip, shift, multiply, add. For causal finite sequences the sum has finitely many nonzero terms, so the computation can be done by hand in a table.</p>
+          <p>Take <span class="mono">x = {1, 2, 3}</span> and <span class="mono">h = {1, 1}</span>, both starting at <span class="mono">n = 0</span>. Then <span class="mono">y[0] = 1</span>, <span class="mono">y[1] = 1·1 + 2·1 = 3</span>, <span class="mono">y[2] = 2·1 + 3·1 = 5</span> and <span class="mono">y[3] = 3·1 = 3</span>. The output has length <span class="mono">3 + 2 − 1 = 4</span> and its sum is 12, which equals the product of the sums of the inputs (6 × 2).</p>
+          <p>In a real-time system the sum is evaluated as a running operation: each new input sample enters, the impulse response is shifted, and the output is a weighted sum of recent inputs. This is exactly the structure of a finite-impulse-response (FIR) filter, and it explains why FIR filters are so easy to implement.</p>
+        </div>
+        <div class="callout key">
+          <div class="co-icon">★</div>
+          <div><h4>Why convolution is the central operation of the course</h4>
+          <p>The same operation reappears as multiplication in the Fourier, Laplace and z domains. Learning to do it in the time domain gives you a physical picture; learning the transform shortcuts gives you speed. Both are needed: the transform tells you <em>what</em> the answer is, the convolution picture tells you <em>why</em> it has that shape.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m2-proj">
+        <h2>2.6 Watch the pulses overlap</h2>
+        <div class="prose">
+          <p>The projection below animates the graphical convolution of two pulses. Step through it to see the flip, the shift, the growing overlap and the resulting trapezoid. The static first frame already shows the full construction, so the explanation survives reduced motion.</p>
+        </div>
+        <div class="projection" data-projection="convolution">
+          <noscript><div class="live-note"><b>Static version:</b> flip h(τ) to h(−τ), slide it right by t, multiply by x(τ) and integrate the overlap. For two causal pulses the result rises linearly, plateaus at the narrower width and falls linearly.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m2-lab">
+        <h2>2.7 Lab — Convolution Workbench</h2>
+        <div class="prose">
+          <p>Choose the input width, the impulse-response decay and the amplitudes. The lab computes the convolution numerically and reports the peak, the area and the support, so you can compare the plot with the two checks from section 2.3.</p>
+        </div>
+        <div class="lab" data-lab="convolution"></div>
+      </section>
+
+      <section class="lesson-section" id="m2-simple">
+        <h2>2.8 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>Imagine striking a bell. The sound you hear is the bell's response to one short hit. If the bell is linear, hitting it twice as hard makes the sound twice as loud; if it is time-invariant, hitting it later produces the same sound, just later.</p>
+          <p>Now imagine a piece of music played at the bell. Every instant of the music is a tiny hit. The total sound is the sum of all those delayed bell responses, each scaled by how loud the music was at that instant. That sum is convolution.</p>
+          <p>The impulse response is the bell's fingerprint. A short, ringing response smears the music; a flat, short response preserves it. A long, decaying response is what makes a room sound reverberant.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>If <span class="mono">h(t) = 0</span> for <span class="mono">t &lt; 0</span>, the system cannot respond before it is hit: it is causal. If <span class="mono">∫|h|dt</span> is infinite, a bounded input can produce an unbounded output: the system is not BIBO stable. These are properties of one function, not of the input.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>Convolution is the continuous analogue of matrix multiplication. An impulse response is a continuous matrix whose columns are shifted copies of one waveform; a Toeplitz matrix is its discrete cousin. In the transform domain those matrices become diagonal, which is why convolution turns into multiplication and why the Fourier basis is so useful. Recognising this connection makes the later transform modules feel like a change of coordinates rather than a new subject.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 2</h3>
+            <ul class="small">
+              <li><b>Definition:</b> y(t) = ∫x(τ)h(t−τ)dτ; y[n] = Σx[k]h[n−k].</li>
+              <li><b>Impulse response:</b> h is the output to δ; it characterises every LTI system.</li>
+              <li><b>Graphical method:</b> flip, shift, multiply, integrate.</li>
+              <li><b>Checks:</b> area multiplies, widths add, delays pass through.</li>
+              <li><b>Special cases:</b> x*δ shifts, x*u integrates.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m2-check">
+        <h2>2.9 Checkpoint</h2>
+        <div class="prose"><p>Five questions from the Intermediate band of this module's bank. Answer first; the hint is free and the full solution appears after your attempt.</p></div>
+        <div class="checkpoint" data-checkpoint="2"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

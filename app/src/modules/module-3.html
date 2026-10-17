@@ -1,0 +1,200 @@
+<article class="module-page" id="module-3" data-module="3" data-title="Waves, Data and Signals" data-promise="Measure a wave, explain attenuation, distortion and noise, and compute the bit rate and bandwidth a link demands." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 3</span>
+      <span class="pill">Physical layer</span>
+      <span class="pill">6 concepts</span>
+    </div>
+    <h1>Waves, Data and Signals</h1>
+    <p class="promise">Every communication link begins with a wave. To design or diagnose one you need four numbers — frequency, wavelength, bandwidth and power — and a clear picture of what the medium does to them.</p>
+    <ul class="outcomes">
+      <li>Relate period, frequency, wavelength, phase and propagation speed for a sinusoidal wave.</li>
+      <li>Explain how the medium sets the speed and which impairments act on a travelling wave.</li>
+      <li>Distinguish data from signal and compute bandwidth from the occupied frequency range.</li>
+      <li>Relate bit rate, signal levels and channel quality, and express power ratios in decibels.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>Two links use the same cable and the same transmitter power. One carries 10 Mbps reliably; the other fails above 2 Mbps. Nothing about the 10 Mbps link is newer or more expensive. What physical quantity have you not been told about, and how would you measure it?</p>
+      <p>By section 3.5 you will answer with bandwidth, levels and signal-to-noise ratio — and you will be able to calculate each one.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m3-s1">
+        <h2>3.1 The anatomy of a travelling wave</h2>
+        <div class="prose">
+          <p>A sinusoidal wave is the simplest carrier of information. It is described by an amplitude, a frequency, a phase and a speed. The same four numbers appear whether the wave is a radio signal, a light pulse in a fibre or a sound wave in water; only the speed and the units change.</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>The wave relationships</span><span class="tag">CORE</span></div>
+              <div class="math">f = 1/T, &nbsp; λ = v/f = vT, &nbsp; φ(t) = 2πft + φ₀</div>
+              <ul class="fx-symbols">
+                <li><b>T</b> period, seconds per cycle</li>
+                <li><b>f</b> frequency, cycles per second (Hz)</li>
+                <li><b>λ</b> wavelength, metres per cycle</li>
+                <li><b>v</b> propagation speed in the medium, m/s</li>
+                <li><b>φ</b> phase, radians (or degrees)</li>
+              </ul>
+              <p class="fx-note">Frequency and period are reciprocals. Wavelength is the distance the wave travels in one period, so it shrinks as frequency rises. In free space a 100 MHz wave has λ = 3 m; in a cable with 0.7 c, the same wave has λ = 2.1 m.</p>
+            </div>
+          </div>
+          <p>Phase is often the hardest idea for students because it is invisible on an amplitude plot. It measures <em>where</em> in its cycle the wave is at a chosen instant. A phase shift of 90° turns a sine into a cosine; a phase shift of 180° inverts the wave. Digital modulation uses exactly these shifts to carry bits, which is why phase must be understood before PSK can make sense.</p>
+          <p>Two waves of the same frequency can be added to give a new wave whose amplitude depends on their phase difference. In phase, they add; 180° out of phase, they cancel. This interference is the basis of both noise cancellation and multipath fading.</p>
+        </div>
+
+        <div class="callout">
+          <div class="co-icon">λ</div>
+          <div><h4>Units are not optional</h4>
+          <p>A frequency in MHz must be converted to Hz before it is used with a speed in m/s. The shortcut λ(m) = 300 / f(MHz) exists only for free space. In any other medium replace 300 by v expressed in <span class="mono">10⁶ m/s</span>, or convert everything to base units and calculate directly.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m3-s2">
+        <h2>3.2 The medium decides the speed</h2>
+        <div class="prose">
+          <p>Guided media — twisted pair, coaxial cable and optical fibre — confine the wave inside a physical path. Unguided media — radio, microwave and infrared — launch the wave into space. The speed in a vacuum is exactly <span class="mono">c = 3 × 10⁸ m/s</span>; in a dielectric it is reduced by the refractive index or velocity factor.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Typical guided media and what changes from one to the next</caption>
+            <thead><tr><th>Medium</th><th>Typical use</th><th>Main advantage</th><th>Main limitation</th></tr></thead>
+            <tbody>
+              <tr><td>Twisted pair</td><td>Telephone, Ethernet</td><td>Cheap, easy to terminate</td><td>Limited bandwidth; picks up interference</td></tr>
+              <tr><td>Coaxial cable</td><td>Cable TV, instrumentation</td><td>Good shielding, wideband</td><td>Bulky and expensive per metre</td></tr>
+              <tr><td>Optical fibre</td><td>Backbone, long haul</td><td>Very wideband, immune to EMI</td><td>Fragile; needs optical termination</td></tr>
+              <tr><td>Free space</td><td>Radio, satellite</td><td>No physical path needed</td><td>Regulated spectrum, fading, weather</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Propagation delay is the distance divided by the speed: <span class="mono">t = d/v</span>. A satellite at 36,000 km gives about 120 ms one way at the speed of light, which is why geostationary links feel sluggish regardless of their bandwidth. Delay and bandwidth are independent quantities: a link can be fast in bits per second and still painfully slow in round-trip time.</p>
+      </section>
+
+      <section class="lesson-section" id="m3-s3">
+        <h2>3.3 What the channel does to the wave</h2>
+        <div class="prose">
+          <p>Three impairments explain almost every real-world link failure. They are distinct, and each has a different cure.</p>
+          <p><strong>Attenuation</strong> is loss of power with distance. It is measured in decibels, and the decibel scale is logarithmic because the ear and most receivers respond logarithmically:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Power ratio in decibels</span><span class="tag">CORE</span></div>
+              <div class="math">G<sub>dB</sub> = 10 log₁₀(P₂/P₁)</div>
+              <ul class="fx-symbols">
+                <li><b>P₁</b> input power</li>
+                <li><b>P₂</b> output power</li>
+                <li><b>G &lt; 0</b> attenuation; <b>G &gt; 0</b> gain</li>
+              </ul>
+              <p class="fx-note">A factor of 2 is 3.01 dB, a factor of 10 is 10 dB, and a factor of 100 is 20 dB. Cascaded blocks add their decibel values because their linear gains multiply.</p>
+            </div>
+          </div>
+          <p><strong>Distortion</strong> is a change in shape caused by different frequency components travelling at different speeds or experiencing different gains. A clean pulse becomes a smeared pulse, and adjacent bits begin to overlap. This is intersymbol interference. Equalisation and careful pulse shaping are the standard remedies.</p>
+          <p><strong>Noise</strong> is unwanted energy added by thermal motion, interfering transmitters, crosstalk or impulsive switching. Thermal noise is unavoidable and sets a floor on every receiver. The relevant quantity is the signal-to-noise ratio, <span class="mono">SNR = P<sub>signal</sub>/P<sub>noise</sub></span>, often expressed in decibels. A signal that is buried in noise cannot be recovered by amplification alone, because the amplifier raises both signal and noise.</p>
+        </div>
+        <div class="callout trap">
+          <div class="co-icon">!</div>
+          <div><h4>Trap: amplification does not improve SNR</h4>
+          <p>An ideal amplifier multiplies signal and noise by the same factor, leaving the ratio unchanged. Only filtering out-of-band noise, increasing transmitter power, improving the receiver, or adding coding can improve the ratio. This is why a weak Wi-Fi signal near the edge of coverage cannot be fixed by simply turning up the volume.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m3-s4">
+        <h2>3.4 Data, signal and bandwidth</h2>
+        <div class="prose">
+          <p><strong>Data</strong> is the information being conveyed: text, an image, a voice sample, a sensor reading. A <strong>signal</strong> is the physical representation of that data — a voltage, a current, a light intensity or an acoustic pressure. Data can be digital or analog, and either can be carried by either kind of signal. A modem is precisely the device that bridges the two.</p>
+          <p><strong>Bandwidth</strong> is the width of the frequency range a signal or channel occupies: <span class="mono">B = f<sub>high</sub> − f<sub>low</sub></span>. It is not the same as the highest frequency. A channel from 1 MHz to 1.1 MHz has 100 kHz of bandwidth, just as a channel from 900 MHz to 900.1 MHz does. This distinction matters in spectrum planning, where the <em>position</em> of the band is set by regulation and the <em>width</em> is set by the application.</p>
+          <p>A baseband signal occupies a band starting at or near zero. A bandpass signal is centred on a carrier and occupies a band far from zero. Passing a baseband signal through a carrier translates its spectrum upward without changing its width. This is why a 20 kHz audio signal needs 20 kHz of bandwidth whether it is sent as sound, as a 1 MHz AM radio wave, or as a 2.4 GHz Wi-Fi subcarrier.</p>
+          <p>Bit rate and bandwidth are related but not identical. More bandwidth generally allows a higher bit rate, but the exact trade-off depends on the number of signal levels, the pulse shape and the noise. Module 8 makes that relationship quantitative with the Nyquist and Shannon formulas.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m3-s5">
+        <h2>3.5 Channel quality and the bit-rate budget</h2>
+        <div class="prose">
+          <p>A practical link must satisfy several constraints at once. The required bit rate sets a minimum symbol rate. The symbol rate, the pulse shape and the modulation order set a minimum bandwidth. The noise floor sets a maximum number of levels that can be distinguished reliably. The transmitted power must be high enough to overcome attenuation but low enough to respect regulatory limits and battery life.</p>
+          <p>The quality of a channel is often summarised by its SNR. High SNR supports many levels and therefore a high bit rate in a given bandwidth; low SNR forces binary signalling, which is robust but spectrally inefficient. Engineers describe this trade-off as the power–bandwidth exchange: you can buy reliability with power or with bandwidth, but not with neither.</p>
+          <p>A useful first-order check is that each extra bit per symbol requires roughly 6 dB more SNR to maintain the same error probability in an AWGN channel. That rule of thumb explains why 256-QAM, with eight bits per symbol, needs a far cleaner channel than BPSK.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 3.1</span><h4>From frequency to wavelength and delay</h4></div>
+          <div class="example-body">
+            <p>A 150 MHz signal travels 3 km through a coaxial cable whose velocity factor is 0.8. Find the wavelength in the cable and the propagation delay.</p>
+            <p><b>Speed in the cable.</b> v = 0.8 × 3×10⁸ = 2.4×10⁸ m/s.</p>
+            <p><b>Wavelength.</b> λ = v/f = 2.4×10⁸ / 1.5×10⁸ = 1.6 m. In free space the same wave would have λ = 2 m, so the cable compresses the wave by the velocity factor.</p>
+            <p><b>Delay.</b> t = 3000 / 2.4×10⁸ = 12.5 µs. Note that the frequency does not appear in the delay: the wave's speed, not its colour, sets the travel time.</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 3.2</span><h4>A decibel chain</h4></div>
+          <div class="example-body">
+            <p>A transmitter launches 10 mW into a cable that loses 12 dB. An amplifier then adds 20 dB before the receiver. What power reaches the receiver?</p>
+            <p><b>Convert to a total gain.</b> G_total = −12 + 20 = +8 dB.</p>
+            <p><b>Convert back to a ratio.</b> 8 dB means a factor of 10<sup>0.8</sup> = 6.31. So P_out = 10 mW × 6.31 = 63.1 mW.</p>
+            <p><b>Check the arithmetic the long way.</b> 10 mW after −12 dB is 10 × 10<sup>−1.2</sup> = 0.631 mW. After +20 dB it is 0.631 × 100 = 63.1 mW. Both routes agree, which is the point of using decibels: gains add.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m3-proj">
+        <h2>3.6 Watch a wave change</h2>
+        <div class="prose">
+          <p>The projection shows a travelling wave and the effect of changing its frequency, amplitude and phase. The readouts are computed from the plotted samples, so the numbers and the curve always agree.</p>
+        </div>
+        <div class="projection" data-projection="wave">
+          <noscript><div class="live-note"><b>Static version:</b> a sinusoidal wave has amplitude A, period T and wavelength λ = vT. Doubling the frequency halves both the period and the wavelength; changing the phase slides the wave along the time axis without changing its shape.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m3-lab">
+        <h2>3.7 Lab — Wave Bench</h2>
+        <div class="prose">
+          <p>Set the frequency, amplitude and phase, and compare the computed period, wavelength and propagation delay. Use the presets to see how a change in frequency leaves the speed unchanged while compressing the wavelength.</p>
+        </div>
+        <div class="lab" data-lab="wave"></div>
+      </section>
+
+      <section class="lesson-section" id="m3-simple">
+        <h2>3.8 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>A wave is a repeating disturbance. Its period is how long one repeat takes; its frequency is how many repeats happen each second. The two are reciprocals. Its wavelength is the physical length of one repeat, which depends on how fast the wave travels.</p>
+          <p>As a wave travels it weakens (attenuation), changes shape (distortion) and picks up unwanted energy (noise). Weakness is measured in decibels, a scale on which multiplying by 10 adds 10 units. Noise is the reason a link cannot be made arbitrarily fast: once the signal is buried, no amount of amplification brings it back.</p>
+          <p>Bandwidth is the width of the frequency range a link can carry. More bandwidth means more room for information, but the room is only useful if the signal is strong and clean enough to fill it.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>A 1 kHz tone has a period of 1 ms. A 1 MHz tone has a period of 1 µs. If both travel at 300 m/µs, their wavelengths are 300 km and 300 m respectively. The higher-frequency wave is physically shorter, which is why high-frequency antennas are small.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>Attenuation, distortion and noise are three different mathematical operations on the channel: a scalar, a linear filter and an additive random process. In the frequency domain the channel is <span class="mono">Y(f) = H(f)X(f) + N(f)</span>. The first two terms are deterministic and can be inverted in principle; the noise term cannot be inverted because the receiver does not know it. This is why equalisation can undo distortion but not noise, and why information theory treats noise as the fundamental limit rather than an engineering inconvenience.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 3</h3>
+            <ul class="small">
+              <li><b>Wave:</b> f = 1/T; λ = v/f; phase shifts the wave in time.</li>
+              <li><b>Delay:</b> t = d/v; independent of frequency and bandwidth.</li>
+              <li><b>Impairments:</b> attenuation (dB), distortion (ISI), noise (SNR).</li>
+              <li><b>dB:</b> 10 log₁₀(P₂/P₁); ×2 = 3 dB, ×10 = 10 dB; cascades add.</li>
+              <li><b>Bandwidth:</b> B = f_high − f_low, a width, not a position.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m3-check">
+        <h2>3.9 Checkpoint</h2>
+        <div class="prose"><p>Five questions from this module's Intermediate band. Answer before revealing the solution; the hint costs nothing.</p></div>
+        <div class="checkpoint" data-checkpoint="3"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

@@ -1,0 +1,217 @@
+<article class="module-page" id="module-4" data-module="4" data-title="Analog Transmission and Modulation" data-promise="Modulate a message onto a carrier with AM, FM, ASK, FSK, PSK or QAM — and explain the bandwidth each choice costs." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 4</span>
+      <span class="pill">Transmission</span>
+      <span class="pill">7 concepts</span>
+    </div>
+    <h1>Analog Transmission and Modulation</h1>
+    <p class="promise">An antenna cannot radiate a baseband voice signal efficiently. Modulation moves the information onto a carrier that the medium can carry, and the choice of modulation fixes the bandwidth, the noise immunity and the hardware.</p>
+    <ul class="outcomes">
+      <li>Explain why modulation is needed and what the carrier does.</li>
+      <li>Compute the AM modulation index, sidebands, bandwidth and power distribution.</li>
+      <li>Describe FM and PM, the deviation ratio and the course bandwidth rule.</li>
+      <li>Compare ASK, FSK, BPSK, QPSK and QAM, and read a constellation diagram.</li>
+      <li>Explain how DSSS, FHSS and THSS spread a signal and why spreading helps.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>An AM station transmits 50 kW of carrier. The music is quiet, so the modulation index is only 0.3. How much of that 50 kW actually carries the music? Once you compute it, you will understand why single-sideband transmission was invented — and why modern systems abandoned analog AM for digital modulation altogether.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m4-s1">
+        <h2>4.1 Why a carrier is necessary</h2>
+        <div class="prose">
+          <p>A baseband signal such as speech occupies a few kilohertz near zero. Direct radiation of such a signal requires an antenna whose size is comparable with the wavelength, which at 1 kHz is 300 km. Modulation solves the problem by multiplying the message by a high-frequency carrier. The information is unchanged, but its spectrum is moved to a band where antennas are small and where many users can share the medium without overlapping.</p>
+          <p>Multiplication by a carrier is a frequency translation. If the message has spectrum <span class="mono">M(f)</span> and the carrier is <span class="mono">cos(2πf<sub>c</sub>t)</span>, the product has spectrum <span class="mono">½M(f − f<sub>c</sub>) + ½M(f + f<sub>c</sub>)</span>. The message is copied to two sidebands, one above and one below the carrier. Every analog and digital modulation scheme is a variation on how those copies are shaped, combined or suppressed.</p>
+          <p>The carrier itself carries no information. It is a vehicle: a pure sinusoid whose amplitude, frequency or phase is varied by the message. The receiver must know its frequency to bring the signal back to baseband, which is why carrier synchronisation is a central receiver problem.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m4-s2">
+        <h2>4.2 Amplitude modulation</h2>
+        <div class="prose">
+          <p>In AM the carrier amplitude follows the message: <span class="mono">s(t) = [A<sub>c</sub> + m(t)]cos(2πf<sub>c</sub>t)</span>. If the message is a single tone <span class="mono">A<sub>m</sub>cos(2πf<sub>m</sub>t)</span>, the envelope reaches a maximum <span class="mono">E<sub>max</sub> = A<sub>c</sub> + A<sub>m</sub></span> and a minimum <span class="mono">E<sub>min</sub> = A<sub>c</sub> − A<sub>m</sub></span>. The modulation index measures how deeply the carrier is varied:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>AM modulation index</span><span class="tag">CORE</span></div>
+              <div class="math">m = (E<sub>max</sub> − E<sub>min</sub>) / (E<sub>max</sub> + E<sub>min</sub>) = A<sub>m</sub>/A<sub>c</sub></div>
+              <ul class="fx-symbols">
+                <li><b>m = 0</b> no modulation, carrier only</li>
+                <li><b>0 &lt; m &lt; 1</b> undermodulated, envelope intact</li>
+                <li><b>m = 1</b> full modulation, envelope touches zero</li>
+                <li><b>m &gt; 1</b> overmodulation, envelope crosses zero and phase reverses</li>
+              </ul>
+              <p class="fx-note">The envelope of an overmodulated signal cannot be recovered by a simple diode detector: the envelope crosses zero and the message is inverted for part of each cycle. This is heard as severe distortion.</p>
+            </div>
+          </div>
+          <p>The spectrum contains the carrier at <span class="mono">f<sub>c</sub></span> and two sidebands at <span class="mono">f<sub>c</sub> ± f<sub>m</sub></span>. The bandwidth is therefore <span class="mono">2f<sub>m</sub></span> for a single tone, and <span class="mono">2B<sub>m</sub></span> for a message occupying a band of width <span class="mono">B<sub>m</sub></span>.</p>
+          <p>The power splits in a fixed way. The carrier carries <span class="mono">P<sub>c</sub></span>; the two sidebands together carry <span class="mono">P<sub>c</sub>m²/2</span>. The total is <span class="mono">P<sub>c</sub>(1 + m²/2)</span>. Even at full modulation, two thirds of the power is in the unmodulated carrier, which conveys nothing.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 4.1</span><h4>Modulation index from an envelope</h4></div>
+          <div class="example-body">
+            <p>An AM envelope reaches 9 V and falls to 3 V. Find the modulation index, the carrier amplitude and the sideband power relative to the carrier.</p>
+            <p><b>Index.</b> m = (9 − 3)/(9 + 3) = 6/12 = 0.5.</p>
+            <p><b>Carrier amplitude.</b> A_c = (E_max + E_min)/2 = 6 V; A_m = (E_max − E_min)/2 = 3 V, and indeed A_m/A_c = 0.5.</p>
+            <p><b>Sideband power.</b> m²/2 = 0.125, so the sidebands carry 12.5% of the carrier power, or 11.1% of the total. A receiver that filters out the carrier loses most of the transmitted energy, which is why suppressed-carrier systems need coherent detection.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m4-s3">
+        <h2>4.3 Suppressing what carries no information</h2>
+        <div class="prose">
+          <p>Standard AM is wasteful: the carrier consumes most of the power and both sidebands carry identical information. Three variants fix this.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>AM variants and their trade-offs</caption>
+            <thead><tr><th>Variant</th><th>What is sent</th><th>Bandwidth</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td>DSB-AM (standard)</td><td>Carrier + both sidebands</td><td>2B<sub>m</sub></td><td>Simple envelope detector; poor power efficiency</td></tr>
+              <tr><td>DSB-SC</td><td>Both sidebands, carrier suppressed</td><td>2B<sub>m</sub></td><td>Saves carrier power; needs coherent detection</td></tr>
+              <tr><td>SSB</td><td>One sideband only</td><td>B<sub>m</sub></td><td>Half the bandwidth and power; harder filtering</td></tr>
+              <tr><td>VSB</td><td>One sideband plus a vestige of the other</td><td>Slightly more than B<sub>m</sub></td><td>Compromise for video; easier filter design</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>SSB is the most spectrally efficient analog scheme, which is why it dominated long-distance voice radio for decades. Its weakness is that suppressing one sideband requires a sharp filter or a precise phase-shift network, and the receiver must reinsert the carrier with the correct frequency and phase.</p>
+      </section>
+
+      <section class="lesson-section" id="m4-s4">
+        <h2>4.4 Angle modulation: FM and PM</h2>
+        <div class="prose">
+          <p>Instead of varying the amplitude, angle modulation varies the instantaneous frequency or phase while keeping the amplitude constant. Frequency modulation (FM) makes the instantaneous frequency proportional to the message; phase modulation (PM) makes the phase proportional to the message. Because the envelope is constant, FM is immune to amplitude noise and can use efficient nonlinear amplifiers.</p>
+          <p>The price is bandwidth. A wideband FM signal needs far more spectrum than AM. The course uses the rule</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>FM bandwidth — course rule</span><span class="tag">RULE</span></div>
+              <div class="math">BW<sub>t</sub> = 10 × BW<sub>m</sub></div>
+              <ul class="fx-symbols">
+                <li><b>BW<sub>m</sub></b> highest modulating frequency</li>
+                <li><b>BW<sub>t</sub></b> transmission bandwidth</li>
+                <li><b>10</b> the course factor for commercial FM</li>
+              </ul>
+              <p class="fx-note">This is the rule used throughout this course. Carson's rule, <span class="mono">2(Δf + f<sub>m</sub>)</span>, gives a tighter estimate for narrowband FM; the course rule is a conservative design factor for the wideband case.</p>
+            </div>
+          </div>
+          <p>The deviation ratio <span class="mono">D = Δf/f<sub>m</sub></span> measures how far the carrier swings relative to the highest message frequency. A larger ratio means more bandwidth and better noise rejection. FM broadcast uses 75 kHz deviation with 15 kHz audio, a ratio of 5, and a channel spacing of 200 kHz, which leaves room for guard bands.</p>
+          <p>PM and FM are closely related: FM can be generated by integrating the message and applying PM, and PM can be generated by differentiating the message and applying FM. Armstrong's indirect method uses this relationship to produce wideband FM from a narrowband phase modulator followed by frequency multipliers.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m4-s5">
+        <h2>4.5 Digital modulation: from one bit to a constellation</h2>
+        <div class="prose">
+          <p>Digital modulation maps bits onto a finite set of waveforms. The set is called a constellation, and each point is a symbol carrying <span class="mono">log₂M</span> bits. The family tree is organised by which parameter is varied.</p>
+          <p><strong>ASK</strong> switches the carrier amplitude between two levels; the simplest form is on–off keying (OOK), which is exactly what an LED transmitter does. <strong>FSK</strong> switches between two frequencies. <strong>PSK</strong> switches phase: BPSK uses 0° and 180°, QPSK uses four phases spaced 90° apart and carries two bits per symbol, and 8-PSK uses eight phases.</p>
+          <p><strong>QAM</strong> combines amplitude and phase. 16-QAM uses a 4×4 grid of points and carries four bits per symbol; 64-QAM carries six. The points are arranged in a square lattice because that maximises the minimum distance between neighbours for a given average power.</p>
+          <div class="table-wrap">
+            <table>
+              <caption>Digital modulation at a glance</caption>
+              <thead><tr><th>Scheme</th><th>Bits per symbol</th><th>Bandwidth efficiency</th><th>Noise sensitivity</th></tr></thead>
+              <tbody>
+                <tr><td>BPSK</td><td>1</td><td>Low</td><td>Most robust</td></tr>
+                <tr><td>QPSK</td><td>2</td><td>Moderate</td><td>Robust</td></tr>
+                <tr><td>8-PSK</td><td>3</td><td>Moderate</td><td>Needs more SNR</td></tr>
+                <tr><td>16-QAM</td><td>4</td><td>High</td><td>Good SNR required</td></tr>
+                <tr><td>64-QAM</td><td>6</td><td>Very high</td><td>Clean channel required</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The bandwidth of a modulated signal is governed by its symbol rate, not its bit rate: a 16-QAM link at 40 Mbps sends 10 Mbaud and therefore occupies roughly the same bandwidth as a 10 Mbps BPSK link. Higher-order modulation buys speed in a fixed bandwidth, but it shrinks the distance between constellation points, so the receiver needs a better SNR.</p>
+          <p>Gray coding assigns adjacent constellation points bit patterns that differ in only one bit. A symbol error caused by noise then produces only one bit error, which halves or better the bit-error rate for the same symbol-error rate.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 4.2</span><h4>Choose a modulation for a bandwidth budget</h4></div>
+          <div class="example-body">
+            <p>A 6 MHz channel must carry 24 Mbps. The available SNR supports 16-QAM but not 64-QAM. Can the link meet the target?</p>
+            <p><b>Bits per symbol.</b> 16-QAM carries 4 bits per symbol, so 24 Mbps requires 6 Mbaud.</p>
+            <p><b>Bandwidth.</b> With ideal Nyquist filtering a passband signal needs B = R_s = 6 MHz. That exactly fills the channel, leaving no excess bandwidth for filter roll-off.</p>
+            <p><b>Realistic answer.</b> A practical raised-cosine filter with 25% roll-off needs 7.5 MHz, so the link fails as specified. Options: use 64-QAM at 4 Mbaud (but the SNR is insufficient), widen the channel, or add a second channel. The example shows why system design is a negotiation between bandwidth, SNR and modulation order, not a single formula.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m4-s6">
+        <h2>4.6 Spreading the spectrum</h2>
+        <div class="prose">
+          <p>Spread-spectrum systems deliberately use more bandwidth than the data requires. The expansion is not waste: it buys resistance to interference, low probability of detection and the ability to share a band with many users.</p>
+          <p><strong>Direct-sequence spread spectrum (DSSS)</strong> multiplies each data bit by a fast pseudo-random chip sequence. The data rate is unchanged, but the transmitted spectrum is widened by the chip rate. A receiver that knows the sequence correlates the signal back to its original bandwidth, while an interfering signal is spread and appears as low-level noise.</p>
+          <p><strong>Frequency-hopping spread spectrum (FHSS)</strong> changes the carrier frequency according to a pseudo-random sequence. An interferer that occupies one channel disrupts only the short intervals in which the hopper lands there, and error correction repairs the damage.</p>
+          <p><strong>Time-hopping spread spectrum (THSS)</strong> varies the time slots in which pulses are transmitted. It is used with ultra-wideband systems and is less common than DSSS or FHSS in consumer equipment.</p>
+          <p>All three techniques trade bandwidth for robustness. The processing gain is roughly the ratio of the spread bandwidth to the data bandwidth; a gain of 10 dB means an interferer can be 10 dB stronger than the signal before the link fails.</p>
+        </div>
+        <div class="callout key">
+          <div class="co-icon">★</div>
+          <div><h4>A constellation is a map, not a picture</h4>
+          <p>Each point in a QAM diagram is a possible value of the received phasor. Noise is a random displacement of the received point; if the displacement is large enough to cross the decision boundary, a symbol error occurs. The minimum distance between points therefore predicts performance directly, and that is why constellation geometry is a design subject rather than a drawing exercise.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m4-proj">
+        <h2>4.7 Watch the constellation move</h2>
+        <div class="prose">
+          <p>The projection shows the modulated carrier, its spectrum and its constellation for several schemes. Use the controls to compare the occupied bandwidth of AM, FM and QAM for the same message.</p>
+        </div>
+        <div class="projection" data-projection="modulation">
+          <noscript><div class="live-note"><b>Static version:</b> AM produces a carrier plus two sidebands; FM keeps a constant envelope but spreads the spectrum; QAM places symbols on a two-dimensional grid and sends several bits per symbol.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m4-lab">
+        <h2>4.8 Lab — Modulation Studio</h2>
+        <div class="prose">
+          <p>Switch between AM, FM, ASK, FSK, BPSK, QPSK and 16-QAM. The lab plots the waveform and constellation from the same symbol stream, so a change in bits is visible in both views at once.</p>
+        </div>
+        <div class="lab" data-lab="modulation"></div>
+      </section>
+
+      <section class="lesson-section" id="m4-simple">
+        <h2>4.9 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>A carrier is a fast, steady wave. Modulation writes information onto it by changing one of three things: how tall it is (amplitude), how fast it wiggles (frequency), or where in its cycle it starts (phase).</p>
+          <p>AM is like changing the volume of a whistle. FM is like changing the pitch. PSK is like changing the timing of the whistle's peaks. QAM changes both volume and timing at once, which lets it send several bits in one breath.</p>
+          <p>Every scheme pays for its speed. AM is simple but wastes power. FM is robust but needs a wide band. QAM is fast but needs a clean signal. Spread spectrum gives up bandwidth on purpose so that the link survives interference.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>In AM the envelope is <span class="mono">A_c + m(t)</span>. If <span class="mono">m(t)</span> goes more negative than <span class="mono">−A_c</span>, the envelope crosses zero and the message is inverted. That is overmodulation, and it cannot be fixed at the receiver. Always check <span class="mono">|m(t)| ≤ A_c</span> before transmitting.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>AM, FM and QAM can all be written as <span class="mono">s(t) = I(t)cos(2πf<sub>c</sub>t) − Q(t)sin(2πf<sub>c</sub>t)</span>, where I and Q are the in-phase and quadrature baseband components. AM uses only I; QPSK uses both with four discrete values; QAM uses a grid of values. This complex-baseband representation is why software-defined radios can switch between schemes by changing a lookup table rather than the hardware.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 4</h3>
+            <ul class="small">
+              <li><b>AM:</b> m = (E_max − E_min)/(E_max + E_min); BW = 2f_m.</li>
+              <li><b>AM power:</b> P_total = P_c(1 + m²/2); sidebands carry P_c m²/2.</li>
+              <li><b>FM:</b> constant envelope; course rule BW = 10 f_m; deviation ratio D = Δf/f_m.</li>
+              <li><b>Digital:</b> M-ary symbol carries log₂M bits; bandwidth set by symbol rate.</li>
+              <li><b>Spread spectrum:</b> DSSS (chips), FHSS (hopping), THSS (time slots).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m4-check">
+        <h2>4.10 Checkpoint</h2>
+        <div class="prose"><p>Five questions from this module's Intermediate band. Answer before revealing the solution.</p></div>
+        <div class="checkpoint" data-checkpoint="4"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

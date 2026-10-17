@@ -1,0 +1,221 @@
+<article class="module-page" id="module-5" data-module="5" data-title="Fourier Analysis and Filtering" data-promise="Build a square wave from harmonics, move between time and frequency, and read a filter's response like a map." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 5</span>
+      <span class="pill">Frequency domain</span>
+      <span class="pill">6 concepts</span>
+    </div>
+    <h1>Fourier Analysis and Filtering</h1>
+    <p class="promise">The Fourier transform is a change of coordinates. It rewrites a signal as a sum of sinusoids, and in doing so turns convolution into multiplication, differentiation into scaling and filter design into geometry.</p>
+    <ul class="outcomes">
+      <li>Expand a periodic signal into a Fourier series and interpret each coefficient.</li>
+      <li>Relate symmetry in time to the shape of the spectrum.</li>
+      <li>Use Parseval's theorem to compute power in the time or frequency domain.</li>
+      <li>Apply the main Fourier-transform properties, including time shift, scaling and modulation.</li>
+      <li>Read a frequency response and predict the output of a filter without solving a differential equation.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>A square wave looks nothing like a sine wave. Yet a handful of sine waves, added in the right proportions, can reproduce it so closely that the difference is invisible on an oscilloscope. How many harmonics does it take to make the edges look sharp — and what happens to the overshoot as you add more?</p>
+      <p>Section 5.2 answers the first question. Section 5.3 explains the overshoot, and why it never disappears no matter how many terms you add.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m5-s1">
+        <h2>5.1 Periodic signals have a line spectrum</h2>
+        <div class="prose">
+          <p>A periodic signal repeats exactly. That single property forces its spectrum to be discrete: it can contain only frequencies that are integer multiples of the fundamental <span class="mono">f₀ = 1/T₀</span>. The amplitudes of those lines are the Fourier-series coefficients.</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Trigonometric Fourier series</span><span class="tag">CORE</span></div>
+              <div class="math">x(t) = a₀ + Σ<sub>n=1</sub><sup>∞</sup> [a<sub>n</sub>cos(2πnf₀t) + b<sub>n</sub>sin(2πnf₀t)]</div>
+              <ul class="fx-symbols">
+                <li><b>a₀</b> the DC value, the average of x over one period</li>
+                <li><b>a<sub>n</sub>, b<sub>n</sub></b> amplitudes of the cosine and sine at the n-th harmonic</li>
+                <li><b>f₀</b> the fundamental, the greatest common divisor of all component frequencies</li>
+              </ul>
+              <p class="fx-note">The coefficients are projections: a<sub>n</sub> = (2/T₀)∫x(t)cos(2πnf₀t)dt and b<sub>n</sub> = (2/T₀)∫x(t)sin(2πnf₀t)dt over one period.</p>
+            </div>
+          </div>
+          <p>The decomposition is useful because sinusoids are eigenfunctions of LTI systems. Feed a sinusoid into a linear time-invariant system and the output is a sinusoid of the same frequency, scaled by the magnitude response and shifted by the phase response. If the input is a sum of sinusoids, the output is the same sum with each term scaled and shifted independently. A complicated differential equation becomes a set of simple multiplications.</p>
+          <p>The coefficients also reveal symmetry. An even signal has only cosine terms; an odd signal has only sine terms; a signal with half-wave symmetry has only odd harmonics. These rules are not memorised for their own sake — they cut the integration work in half and provide a check on a computed series.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Symmetry and the coefficients it forces</caption>
+            <thead><tr><th>Symmetry</th><th>Condition</th><th>Consequence</th></tr></thead>
+            <tbody>
+              <tr><td>Even</td><td>x(−t) = x(t)</td><td>All b<sub>n</sub> = 0; only cosines and DC</td></tr>
+              <tr><td>Odd</td><td>x(−t) = −x(t)</td><td>All a<sub>n</sub> = 0, including DC; only sines</td></tr>
+              <tr><td>Half-wave</td><td>x(t + T₀/2) = −x(t)</td><td>All even harmonics vanish</td></tr>
+              <tr><td>Quarter-wave</td><td>Even plus half-wave</td><td>Only odd cosine terms</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m5-s2">
+        <h2>5.2 The square wave, term by term</h2>
+        <div class="prose">
+          <p>A square wave alternating between <span class="mono">+A</span> and <span class="mono">−A</span> is odd and half-wave symmetric, so it contains only odd sine terms:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Square-wave series</span><span class="tag">RESULT</span></div>
+              <div class="math">x(t) = (4A/π)[sin(ω₀t) + ⅓sin(3ω₀t) + ⅕sin(5ω₀t) + …]</div>
+              <ul class="fx-symbols">
+                <li><b>4A/π</b> the fundamental amplitude</li>
+                <li><b>1/n</b> the fall-off of the n-th harmonic</li>
+                <li><b>odd n only</b> because of half-wave symmetry</li>
+              </ul>
+              <p class="fx-note">The 1/n fall-off is slow. To reduce the amplitude of the first omitted harmonic below 1% of the fundamental you need about 100 terms.</p>
+            </div>
+          </div>
+          <p>Adding the first term gives a sine. Adding the third makes the shoulders square up. Adding the fifth, seventh and ninth sharpens the edges further, but something stubborn happens near each transition: the partial sum overshoots the square wave by about 9% of the jump and the overshoot does not shrink as more terms are added. This is the Gibbs phenomenon. The ripple moves closer to the edge and becomes narrower, but its height approaches a fixed limit.</p>
+          <p>The practical lesson is that a finite bandwidth cannot reproduce a discontinuity exactly. Every real channel truncates the spectrum, so every real channel produces ringing at sharp edges. The engineer's job is to keep that ringing below the decision threshold, not to eliminate it.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 5.1</span><h4>Amplitude of the third harmonic</h4></div>
+          <div class="example-body">
+            <p>A ±6 V square wave has a fundamental of 2 kHz. Find the amplitude of the third harmonic and its frequency.</p>
+            <p><b>Coefficient.</b> b₃ = 4A/(3π) = 24/(3π) = 8/π = 2.546 V.</p>
+            <p><b>Frequency.</b> 3 × 2 kHz = 6 kHz.</p>
+            <p><b>Check.</b> The fundamental amplitude is 4A/π = 24/π = 7.639 V. The ratio b₃/b₁ = 1/3, as the 1/n rule predicts. The third harmonic carries (1/3)² = 1/9 of the fundamental's power.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m5-s3">
+        <h2>5.3 Power, Parseval and the line spectrum</h2>
+        <div class="prose">
+          <p>For a periodic signal the average power is the sum of the powers of its harmonics. Because sinusoids of different frequencies are orthogonal, there are no cross terms:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Parseval's theorem for a periodic signal</span><span class="tag">CORE</span></div>
+              <div class="math">P = a₀² + ½Σ<sub>n=1</sub><sup>∞</sup>(a<sub>n</sub>² + b<sub>n</sub>²)</div>
+              <ul class="fx-symbols">
+                <li><b>a₀²</b> power in the DC component</li>
+                <li><b>A<sub>n</sub>²/2</b> power in a sinusoid of amplitude A<sub>n</sub></li>
+                <li><b>P</b> average power in a 1 Ω resistor</li>
+              </ul>
+              <p class="fx-note">Parseval says energy is conserved when you change coordinates. The power computed from the waveform equals the power computed by summing the spectral lines.</p>
+            </div>
+          </div>
+          <p>A line spectrum plots the amplitude of each harmonic against frequency. It is a compact portrait of a periodic signal: the spacing tells you the fundamental, the envelope tells you the pulse shape, and the missing lines tell you the symmetry. For a rectangular pulse train of duty cycle <span class="mono">d</span>, the envelope is a sinc whose zeros occur at multiples of <span class="mono">1/τ</span>, where τ is the pulse width.</p>
+          <p>The DC value is the average. For a pulse train that is high for a fraction d of each period, the average is <span class="mono">A·d</span>. For a waveform with equal positive and negative excursions, the DC value is zero and the line at f = 0 disappears.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m5-s4">
+        <h2>5.4 From series to transform</h2>
+        <div class="prose">
+          <p>A non-periodic signal has a continuous spectrum. The Fourier series becomes the Fourier transform:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Fourier transform pair</span><span class="tag">CORE</span></div>
+              <div class="math">X(jω) = ∫<sub>−∞</sub><sup>∞</sup> x(t)e<sup>−jωt</sup>dt, &nbsp; x(t) = (1/2π)∫X(jω)e<sup>jωt</sup>dω</div>
+              <ul class="fx-symbols">
+                <li><b>X(jω)</b> complex spectrum: magnitude and phase</li>
+                <li><b>ω = 2πf</b> angular frequency, rad/s</li>
+                <li><b>|X|²</b> energy spectral density</li>
+              </ul>
+              <p class="fx-note">The transform exists when the signal is absolutely integrable or contains impulses. Every signal in this course satisfies one of those conditions.</p>
+            </div>
+          </div>
+          <p>Five properties do most of the work in practice. Linearity lets you transform a sum term by term. Time shift multiplies the spectrum by a phase factor without changing its magnitude. Time scaling widens or narrows the spectrum inversely. Modulation shifts the spectrum by the carrier frequency. Convolution in time becomes multiplication in frequency, which is the single most useful property in filter analysis.</p>
+          <div class="table-wrap">
+            <table>
+              <caption>Transform pairs worth recognising on sight</caption>
+              <thead><tr><th>Time domain</th><th>Frequency domain</th><th>Interpretation</th></tr></thead>
+              <tbody>
+                <tr><td>δ(t)</td><td>1</td><td>An impulse contains every frequency equally</td></tr>
+                <tr><td>1</td><td>2πδ(ω)</td><td>A constant has only DC</td></tr>
+                <tr><td>A rect(t/τ)</td><td>Aτ sinc(ωτ/2π)</td><td>A pulse has a sinc spectrum</td></tr>
+                <tr><td>e<sup>−at</sup>u(t)</td><td>1/(a + jω)</td><td>A decaying exponential is a low-pass spectrum</td></tr>
+                <tr><td>cos(ω₀t)</td><td>π[δ(ω−ω₀) + δ(ω+ω₀)]</td><td>A sinusoid is two impulses</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m5-s5">
+        <h2>5.5 Frequency response and filters</h2>
+        <div class="prose">
+          <p>The frequency response of an LTI system is the Fourier transform of its impulse response: <span class="mono">H(jω) = ∫h(t)e<sup>−jωt</sup>dt</span>. Its magnitude tells you how much each frequency is amplified or attenuated; its phase tells you how much each frequency is delayed. Together they predict the steady-state response to any sinusoid: <span class="mono">|H(jω₀)|cos(ω₀t + ∠H(jω₀))</span>.</p>
+          <p>A filter is specified by its passband, stopband and transition region. An ideal low-pass filter has unit gain below the cutoff and zero gain above it, with a vertical transition. That characteristic is not realisable with a finite number of components because its impulse response is a sinc that extends from minus infinity to plus infinity. Practical filters approach it with a gradual transition and a specified ripple.</p>
+          <p>The RC low-pass filter is the simplest real example. Its transfer function is <span class="mono">H(jω) = 1/(1 + jωRC)</span>, with a cutoff at <span class="mono">ω<sub>c</sub> = 1/RC</span>. At the cutoff the magnitude is <span class="mono">1/√2</span>, which is −3 dB, and the phase is −45°. Above the cutoff the magnitude falls at 20 dB per decade. Cascading two identical stages gives −40 dB per decade but also changes the −3 dB frequency, because the stages load each other unless buffered.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 5.2</span><h4>RC filter attenuation</h4></div>
+          <div class="example-body">
+            <p>An RC low-pass filter has R = 1 kΩ and C = 100 nF. What is the cutoff frequency, and what is the gain at 5 kHz?</p>
+            <p><b>Time constant.</b> RC = 10³ × 100×10⁻⁹ = 10⁻⁴ s, so ω_c = 10⁴ rad/s and f_c = 1/(2πRC) = 1.591 kHz.</p>
+            <p><b>Gain at 5 kHz.</b> The ratio f/f_c = 5/1.591 = 3.143. |H| = 1/√(1 + 3.143²) = 1/√(10.88) = 0.303. The output is 30.3% of the input, or −10.4 dB.</p>
+            <p><b>Check.</b> At a frequency 3.14 times the cutoff the filter is already well into its 20 dB/decade slope. One octave above cutoff (2f_c) would give 1/√5 = 0.447, so 0.303 at 3.14f_c is plausible.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m5-proj">
+        <h2>5.6 Watch harmonics build a waveform</h2>
+        <div class="prose">
+          <p>The projection adds successive harmonics of a square wave and shows the partial sum. Step through it to see how each odd harmonic sharpens the edge and how the Gibbs overshoot survives every truncation.</p>
+        </div>
+        <div class="projection" data-projection="fourier">
+          <noscript><div class="live-note"><b>Static version:</b> a square wave equals (4A/π)[sin ω₀t + ⅓sin 3ω₀t + ⅕sin 5ω₀t + …]. Partial sums approach the square wave but overshoot each transition by about 9%; adding terms narrows the overshoot without removing it.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m5-lab">
+        <h2>5.7 Lab — Harmonic Builder</h2>
+        <div class="prose">
+          <p>Add or remove harmonics and watch the waveform and its line spectrum update together. The lab computes the spectrum from the same coefficients that generate the waveform, so the two views cannot disagree.</p>
+        </div>
+        <div class="lab" data-lab="fourier"></div>
+      </section>
+
+      <section class="lesson-section" id="m5-simple">
+        <h2>5.8 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>Any repeating shape can be built from pure tones. A square wave is a loud fundamental plus weaker thirds, fifths, sevenths and so on. A triangle wave uses the same odd harmonics with different strengths. The recipe of strengths is the Fourier series.</p>
+          <p>The Fourier transform does the same job for a signal that never repeats. Instead of a list of tones, you get a continuous graph showing how much of each frequency is present. A short pulse spreads across many frequencies; a long smooth signal concentrates in a narrow band.</p>
+          <p>A filter is a device that keeps some frequencies and removes others. Its frequency response is a map of what it keeps. Because convolution in time becomes multiplication in frequency, you can predict the output by multiplying the signal's spectrum by the filter's response — no differential equation required.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>If a signal has period 4 ms, its fundamental is 250 Hz and its harmonics are 250, 500, 750 Hz and so on. A component at 300 Hz cannot belong to that signal; it would make the sum non-periodic with period 4 ms. Checking that every component is an integer multiple of one fundamental is the fastest periodicity test.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>The Fourier transform diagonalises any LTI operator. In matrix language, convolution by h is a Toeplitz matrix, and the Fourier basis is its eigenbasis. This is why the transform turns convolution into multiplication and why the frequency response is an eigenvalue. The same idea reappears for the Laplace and z transforms, with the difference that those transforms also encode the transient behaviour through their region of convergence.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 5</h3>
+            <ul class="small">
+              <li><b>Series:</b> x = a₀ + Σ(a<sub>n</sub>cos + b<sub>n</sub>sin); harmonics at nf₀.</li>
+              <li><b>Symmetry:</b> even → cosines; odd → sines; half-wave → odd harmonics.</li>
+              <li><b>Square wave:</b> (4A/π)Σ sin(nω₀t)/n for odd n; 9% Gibbs overshoot.</li>
+              <li><b>Parseval:</b> P = a₀² + ½Σ(a<sub>n</sub>² + b<sub>n</sub>²).</li>
+              <li><b>Filter:</b> H(jω) = ∫h e<sup>−jωt</sup>dt; RC cutoff at 1/RC, −3 dB and −45°.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m5-check">
+        <h2>5.9 Checkpoint</h2>
+        <div class="prose"><p>Five questions from this module's Intermediate band. Answer before revealing the solution.</p></div>
+        <div class="checkpoint" data-checkpoint="5"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

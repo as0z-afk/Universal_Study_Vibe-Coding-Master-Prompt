@@ -1,0 +1,215 @@
+<article class="module-page" id="module-9" data-module="9" data-title="State-Space Analysis" data-promise="Write any system as first-order state equations and read its modes, stability and transfer function from the matrix." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 9</span>
+      <span class="pill">Modern control</span>
+      <span class="pill">6 concepts</span>
+    </div>
+    <h1>State-Space Analysis</h1>
+    <p class="promise">Transfer functions describe one input and one output. State space describes everything happening inside, which is why it scales to multiple inputs, multiple outputs and computer control.</p>
+    <ul class="outcomes">
+      <li>Choose state variables for a circuit or a mechanical system and write the state equations.</li>
+      <li>Solve the state equation with the matrix exponential and interpret each term.</li>
+      <li>Read stability, natural frequencies and damping from the eigenvalues of A.</li>
+      <li>Derive the transfer function from (A, B, C, D) and explain pole–zero cancellation.</li>
+      <li>Test controllability and observability with the rank of the controllability and observability matrices.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>A two-state system has eigenvalues at −2 and +1. Its transfer function, after a cancellation, looks like a simple stable first-order lag. Is the system stable? The answer depends on whether you are allowed to see the unstable mode — and that is a question about observability, not about the transfer function.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m9-s1">
+        <h2>9.1 What a state variable is</h2>
+        <div class="prose">
+          <p>A state variable is a quantity that stores energy or memory: the voltage across a capacitor, the current through an inductor, the position and velocity of a mass. The complete set of state variables at time t summarises everything about the past that is needed to predict the future. Given the state and the future inputs, the future is determined.</p>
+          <p>The state-space model writes the system as a set of first-order differential equations plus an output equation:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Continuous-time state model</span><span class="tag">CORE</span></div>
+              <div class="math">ẋ(t) = A x(t) + B u(t), &nbsp; y(t) = C x(t) + D u(t)</div>
+              <ul class="fx-symbols">
+                <li><b>x</b> state vector, n × 1</li>
+                <li><b>A</b> state matrix, n × n</li>
+                <li><b>B</b> input matrix, n × m</li>
+                <li><b>C</b> output matrix, p × n</li>
+                <li><b>D</b> feedthrough matrix, p × m</li>
+              </ul>
+              <p class="fx-note">The dimensions must match: A is square with one row per state, B has one row per state and one column per input, C has one row per output. D is often zero because most physical systems cannot respond instantly.</p>
+            </div>
+          </div>
+          <p>The first-order form is not a restriction. Any n-th order differential equation can be rewritten as n first-order equations by choosing the derivatives as states. The reward is that numerical integration, matrix analysis and computer control all work with first-order systems.</p>
+          <p>For discrete time the derivative becomes a difference: <span class="mono">x[k+1] = A x[k] + B u[k]</span>. The same matrices appear, and the same stability question becomes <span class="mono">|λ<sub>i</sub>| &lt; 1</span> instead of <span class="mono">Re(λ<sub>i</sub>) &lt; 0</span>.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 9.1</span><h4>An RC circuit in state space</h4></div>
+          <div class="example-body">
+            <p>A series RC circuit has input voltage u and output voltage across the capacitor. Choose the capacitor voltage as the state.</p>
+            <p><b>KVL.</b> u = Ri + v_C, and i = C dv_C/dt.</p>
+            <p><b>State equation.</b> C dv_C/dt = (u − v_C)/R, so v̇_C = −v_C/(RC) + u/(RC). Therefore A = −1/(RC), B = 1/(RC).</p>
+            <p><b>Output.</b> y = v_C, so C = 1 and D = 0.</p>
+            <p><b>Numbers.</b> With R = 1 kΩ and C = 1 µF, RC = 1 ms, so A = −1000. The eigenvalue −1000 is the pole at s = −1000, the time constant is 1 ms and the system is stable.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-s2">
+        <h2>9.2 The matrix exponential and the state transition</h2>
+        <div class="prose">
+          <p>For a constant input the solution of the state equation separates into a zero-input response and a zero-state response:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>State solution</span><span class="tag">CORE</span></div>
+              <div class="math">x(t) = e<sup>At</sup>x(0) + ∫₀<sup>t</sup>e<sup>A(t−τ)</sup>B u(τ)dτ</div>
+              <ul class="fx-symbols">
+                <li><b>e<sup>At</sup></b> state transition matrix</li>
+                <li><b>x(0)</b> initial state</li>
+                <li><b>∫…</b> the forced response, a convolution with the input</li>
+              </ul>
+              <p class="fx-note">The transition matrix is the matrix analogue of e<sup>at</sup>. It satisfies d(e<sup>At</sup>)/dt = A e<sup>At</sup> and e<sup>A·0</sup> = I.</p>
+            </div>
+          </div>
+          <p>If A can be diagonalised, <span class="mono">A = VΛV<sup>−1</sup></span> and <span class="mono">e<sup>At</sup> = V e<sup>Λt</sup>V<sup>−1</sup></span>. Each diagonal entry of <span class="mono">e<sup>Λt</sup></span> is <span class="mono">e<sup>λ<sub>i</sub>t</sup></span>, so each eigenvalue contributes one mode. The eigenvectors in V determine how much of each mode appears in each state.</p>
+          <p>A repeated eigenvalue with only one eigenvector produces a Jordan block and a term <span class="mono">t e<sup>λt</sup></span>. A complex conjugate pair produces a damped sinusoid. The matrix exponential therefore packages every qualitative behaviour the system can exhibit.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-s3">
+        <h2>9.3 Eigenvalues are the poles</h2>
+        <div class="prose">
+          <p>The eigenvalues of A are the roots of <span class="mono">det(sI − A) = 0</span>, which is exactly the denominator of the transfer function. This is not a coincidence: both describe the natural modes of the same system.</p>
+          <p>For a 2×2 matrix the characteristic polynomial is <span class="mono">s² − (trace A)s + det A</span>. Two numbers, the trace and the determinant, determine the poles. For higher orders, Routh–Hurwitz or a numerical root finder is used.</p>
+          <ul class="tight">
+            <li><strong>All eigenvalues in the left half-plane:</strong> stable; every mode decays.</li>
+            <li><strong>A pair on the imaginary axis:</strong> marginally stable; sustained oscillation.</li>
+            <li><strong>Any eigenvalue in the right half-plane:</strong> unstable; that mode grows.</li>
+            <li><strong>Complex pair σ ± jω<sub>d</sub>:</strong> oscillation at ω<sub>d</sub>, decay at rate |σ|.</li>
+          </ul>
+          <p>The trace is the sum of the eigenvalues and the determinant is their product. These identities are quick checks when you compute poles by hand, and they survive a change of state coordinates.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-s4">
+        <h2>9.4 From state space to a transfer function</h2>
+        <div class="prose">
+          <p>Take the Laplace transform of the state equations with zero initial conditions. Then <span class="mono">sX = AX + BU</span> and <span class="mono">Y = CX + DU</span>. Eliminating X gives:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Transfer function from state space</span><span class="tag">CORE</span></div>
+              <div class="math">H(s) = C(sI − A)<sup>−1</sup>B + D</div>
+              <ul class="fx-symbols">
+                <li><b>(sI − A)<sup>−1</sup></b> the resolvent matrix</li>
+                <li><b>C…B</b> selects the input-to-output path</li>
+                <li><b>D</b> the direct feedthrough term</li>
+              </ul>
+              <p class="fx-note">The denominator of H(s) is det(sI − A). If a zero of the numerator cancels a pole, that mode is present in the state but invisible at the output.</p>
+            </div>
+          </div>
+          <p>This formula explains the hook at the start of the module. A state-space system can be internally unstable while its transfer function looks stable, if the unstable mode is unobservable or uncontrollable. Such a system is called internally unstable but input–output stable. In practice it is dangerous: the hidden mode can saturate an actuator or destroy the plant even though the measured output looks well behaved.</p>
+          <p>Realisation is the reverse problem: given H(s), find matrices that produce it. The controllable canonical form and the observable canonical form are standard constructions. They are not unique — infinitely many state choices produce the same input–output behaviour — but they all share the same eigenvalues.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 9.2</span><h4>Transfer function from two states</h4></div>
+          <div class="example-body">
+            <p>Let A = [0 1; −6 −5], B = [0; 1], C = [1 0], D = 0. Find H(s).</p>
+            <p><b>Characteristic polynomial.</b> trace = −5, det = 0·(−5) − 1·(−6) = 6. So det(sI − A) = s² + 5s + 6 = (s+2)(s+3).</p>
+            <p><b>Numerator.</b> Compute C adj(sI − A) B. For this companion form the result is 1, so H(s) = 1/[(s+2)(s+3)].</p>
+            <p><b>Check.</b> The DC gain is 1/6. The impulse response is the inverse Laplace of the expression, a difference of two exponentials. Both poles are negative, so the system is stable.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-s5">
+        <h2>9.5 Controllability and observability</h2>
+        <div class="prose">
+          <p>A state is <strong>controllable</strong> if an input can drive it to any desired value in finite time. A state is <strong>observable</strong> if its value can be deduced from the output over time. Both are rank tests on matrices built from A, B and C.</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Controllability and observability matrices</span><span class="tag">TEST</span></div>
+              <div class="math">𝒞 = [B &nbsp; AB &nbsp; A²B &nbsp;…], &nbsp; 𝒪 = [C; CA; CA²; …]</div>
+              <ul class="fx-symbols">
+                <li><b>rank 𝒞 = n</b> fully controllable</li>
+                <li><b>rank 𝒪 = n</b> fully observable</li>
+                <li><b>n</b> number of states</li>
+              </ul>
+              <p class="fx-note">For a single-input, single-output second-order system, both tests reduce to a nonzero determinant. A zero determinant means at least one mode cannot be reached or cannot be seen.</p>
+            </div>
+          </div>
+          <p>Controllability is about actuators; observability is about sensors. A system can be controllable but not observable (you can steer it but not measure where it went) or observable but not controllable (you can measure it but not affect it). Neither property is required for stability, but both are required for most control and estimation designs.</p>
+          <p>The popov–Hautus tests are the modern form: the pair (A, B) is controllable if and only if no left eigenvector of A is orthogonal to B. The matrix rank test and the eigenvector test answer the same question; the rank test is easier to compute by hand, the eigenvector test is easier to interpret.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-s6">
+        <h2>9.6 Discrete-time state models</h2>
+        <div class="prose">
+          <p>A digital controller updates the state once per sample: <span class="mono">x[k+1] = A<sub>d</sub>x[k] + B<sub>d</sub>u[k]</span>. The continuous matrices are converted using the matrix exponential, <span class="mono">A<sub>d</sub> = e<sup>AT</sup></span>, and an integral of the same exponential for B. The eigenvalues map as <span class="mono">z<sub>i</sub> = e<sup>λ<sub>i</sub>T</sup></span>.</p>
+          <p>This mapping preserves the stability boundary: a continuous pole in the left half-plane maps inside the unit circle. It also preserves damping and oscillation frequency, but it aliases frequencies above the Nyquist rate, exactly as Module 8 predicted. A controller designed in continuous time and discretised at too low a rate can therefore behave very differently from its continuous prototype.</p>
+          <p>For hand calculations, the forward-Euler approximation <span class="mono">A<sub>d</sub> ≈ I + AT</span> is often used. It is accurate only when the sampling interval is much shorter than the fastest time constant, and it can even turn a stable continuous system into an unstable discrete one if T is too large.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-proj">
+        <h2>9.7 Watch the phase portrait</h2>
+        <div class="prose">
+          <p>The projection plots the state trajectory of a two-state system from several initial conditions. Change the matrix entries to see a stable node, a saddle, a spiral and a centre. The arrows show the vector field, so the trajectory and the dynamics are visibly the same object.</p>
+        </div>
+        <div class="projection" data-projection="state">
+          <noscript><div class="live-note"><b>Static version:</b> a stable node attracts every trajectory, a saddle repels along one direction and attracts along another, and a centre circles forever. The eigenvalues of A decide which picture appears.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-lab">
+        <h2>9.8 Lab — State-Space Simulator</h2>
+        <div class="prose">
+          <p>Edit the 2×2 A matrix, the input vector and the output vector, then run the simulation. The lab integrates the state equations with RK4 and overlays the trajectory, the eigenvalues and the step response so the matrix and the motion can be compared directly.</p>
+        </div>
+        <div class="lab" data-lab="state"></div>
+      </section>
+
+      <section class="lesson-section" id="m9-simple">
+        <h2>9.9 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>The state of a system is the smallest set of numbers you need to know right now to predict what it will do next. For a moving car, that is its position and its speed. For an RC circuit, it is the capacitor voltage.</p>
+          <p>The A matrix says how the states push on each other. The B vector says how the input pushes them. The C vector says which combination of states you can measure. Together they are a complete description.</p>
+          <p>The eigenvalues of A are the system's natural rhythms. Negative real eigenvalues mean decay; positive mean growth; imaginary pairs mean oscillation. A transfer function sees only the rhythms that are both reachable from the input and visible at the output. State space sees all of them, which is why it is the language of modern control.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>For a diagonal A with entries −1 and −4, the states decay as e<sup>−t</sup> and e<sup>−4t</sup>. The slower mode dominates after a few seconds. The trace is −5 and the determinant is 4, so the characteristic polynomial is s² + 5s + 4 = (s+1)(s+4), which matches.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>State space turns system theory into linear algebra. The matrix exponential is the semigroup of the dynamics; controllability and observability are rank conditions on invariant subspaces; the transfer function is a Schur complement of the resolvent. The same structures reappear in Kalman filtering, model predictive control and machine learning, where a hidden state is inferred from noisy observations. The vocabulary changes; the linear algebra does not.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 9</h3>
+            <ul class="small">
+              <li><b>Model:</b> ẋ = Ax + Bu, y = Cx + Du; A is n×n.</li>
+              <li><b>Solution:</b> x(t) = e<sup>At</sup>x(0) + ∫e<sup>A(t−τ)</sup>Bu dτ.</li>
+              <li><b>Poles:</b> eigenvalues of A; det(sI−A) = s² − (tr A)s + det A for 2×2.</li>
+              <li><b>Transfer:</b> H(s) = C(sI−A)<sup>−1</sup>B + D.</li>
+              <li><b>Tests:</b> rank[B AB …] = n for controllability; rank[C; CA; …] = n for observability.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m9-check">
+        <h2>9.10 Checkpoint</h2>
+        <div class="prose"><p>Five questions from this module's Intermediate band. Answer before revealing the solution.</p></div>
+        <div class="checkpoint" data-checkpoint="9"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

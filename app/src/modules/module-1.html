@@ -1,0 +1,359 @@
+<article class="module-page" id="module-1" data-module="1" data-title="Signals and Systems" data-promise="Classify any waveform, split it into even and odd parts, and decide exactly what makes a system linear, causal or stable." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 1</span>
+      <span class="pill">Foundations</span>
+      <span class="pill">7 concepts</span>
+    </div>
+    <h1>Signals and Systems</h1>
+    <p class="promise">Before a signal can be transmitted it has to be described. Before a system can be designed it has to be classified. This module builds that vocabulary and makes each definition testable.</p>
+    <ul class="outcomes">
+      <li>Represent a physical quantity as a function of time and distinguish continuous from discrete descriptions.</li>
+      <li>Test a signal for periodicity, symmetry, energy or power, and decompose it into even and odd parts.</li>
+      <li>Recognise the six basic signals and use the sifting property of the impulse.</li>
+      <li>Test a system for memory, causality, BIBO stability, linearity and time-invariance.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>Two systems see the same input. One is described by <span class="mono">y(t) = x(t − 1)</span>, the other by <span class="mono">y(t) = x(1 − t)</span>. Both look like simple delays or reflections. Only one is time-invariant. Which one — and why does the difference matter when you build a filter?</p>
+      <p>Hold the question. By section 1.5 you will answer it by testing, not by guessing.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m1-s1">
+        <h2>1.1 A signal is a function; a system is an operator</h2>
+        <div class="prose">
+          <p>A <strong>signal</strong> is a function representing a physical quantity that carries information. The voltage across a capacitor, the pressure at a microphone, the brightness of a pixel and the position of a robot joint are all signals once they are written as functions of an independent variable. In this course the independent variable is usually time, written <span class="mono">t</span> for continuous time and <span class="mono">n</span> for discrete time. The dependent variable is written <span class="mono">x(t)</span> or <span class="mono">x[n]</span>.</p>
+          <p>A <strong>system</strong> is a rule that maps an input signal to an output signal. Write the rule as an operator <span class="mono">T</span>:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>System as an operator</span><span class="tag">DEF</span></div>
+              <div class="math">y(t) = T{x(t)}</div>
+              <ul class="fx-symbols">
+                <li><b>x(t)</b> input signal</li>
+                <li><b>y(t)</b> output or response</li>
+                <li><b>T{·}</b> the rule the system applies</li>
+              </ul>
+              <p class="fx-note">For discrete time the same rule is y[n] = T{x[n]}. The notation does not yet say the system is linear, causal or stable — those are separate properties that must be tested.</p>
+            </div>
+          </div>
+          <p>The distinction matters because the same physical object can be described at several levels. A resistor is a system whose output is a scaled copy of its input current. An RC circuit is a system whose output depends on the recent history of its input. A communication channel is a system that adds attenuation, delay, distortion and noise. Once the rule is written, the theory of this course applies to all of them.</p>
+        </div>
+
+        <div class="callout">
+          <div class="co-icon">→</div>
+          <div><h4>Why the independent variable matters</h4>
+          <p>A continuous-time signal is defined for every real value of <span class="mono">t</span>. A discrete-time signal is defined only at integer values of <span class="mono">n</span>, usually produced by sampling a continuous signal at uniform intervals <span class="mono">T<sub>s</sub></span>: <span class="mono">x[n] = x(nT<sub>s</sub>)</span>. The sample index is dimensionless; the time of sample <span class="mono">n</span> is <span class="mono">nT<sub>s</sub></span>. Confusing the index with the time is the source of many errors in later modules.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m1-s2">
+        <h2>1.2 Classifying signals along independent axes</h2>
+        <div class="prose">
+          <p>Signal classifications are not a single hierarchy. A signal can be continuous-time and digital, or discrete-time and analog, or both random and periodic. Treat each classification as a separate question with its own test.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <caption>Table 1.1 — Independent classifications and the test that decides each one</caption>
+            <thead><tr><th scope="col">Classification</th><th scope="col">Decision test</th><th scope="col">Example</th></tr></thead>
+            <tbody>
+              <tr><td>Continuous / discrete time</td><td>Is the independent variable defined for every real value or only at integers?</td><td>Mains voltage is CT; a monthly average temperature is DT.</td></tr>
+              <tr><td>Analog / digital</td><td>Can the dependent variable take any value in a range, or only a finite set?</td><td>Vinyl groove is analog; a 16-bit audio sample is digital.</td></tr>
+              <tr><td>Real / complex</td><td>Are values real numbers, or do they have an imaginary part?</td><td>A real sinusoid; a phasor <span class="mono">Ae<sup>jθ</sup></span>.</td></tr>
+              <tr><td>Deterministic / random</td><td>Is the value at every instant fixed by a rule, or described by a probability model?</td><td><span class="mono">sin(ωt)</span> is deterministic; thermal noise is random.</td></tr>
+              <tr><td>Even / odd / neither</td><td>Does <span class="mono">x(−t) = x(t)</span>, <span class="mono">x(−t) = −x(t)</span>, or neither hold?</td><td><span class="mono">cos t</span> is even; <span class="mono">sin t</span> is odd; <span class="mono">e<sup>−t</sup>u(t)</span> is neither.</td></tr>
+              <tr><td>Periodic / aperiodic</td><td>Is there a smallest positive <span class="mono">T</span> with <span class="mono">x(t+T) = x(t)</span> for all <span class="mono">t</span>?</td><td><span class="mono">cos(2πf₀t)</span> is periodic; a rectangular pulse is not.</td></tr>
+              <tr><td>Energy / power</td><td>Is the total energy finite, or is the average power finite and nonzero?</td><td>A pulse has finite energy; a sine wave has finite power and infinite energy.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Even and odd decomposition</h3>
+        <div class="prose">
+          <p>Every signal — with mild technical conditions at points of discontinuity — can be written as the sum of an even part and an odd part. The construction is simple and worth memorising, because it separates a waveform's symmetric content from its antisymmetric content.</p>
+        </div>
+        <div class="formula-grid">
+          <div class="formula">
+            <div class="fx-name"><span>Even and odd parts</span><span class="tag">M1</span></div>
+            <div class="math">x<sub>e</sub>(t) = <span class="frac"><span>1</span><span>2</span></span>[x(t) + x(−t)], &nbsp; x<sub>o</sub>(t) = <span class="frac"><span>1</span><span>2</span></span>[x(t) − x(−t)]</div>
+            <ul class="fx-symbols">
+              <li><b>x<sub>e</sub></b> even part, x<sub>e</sub>(−t) = x<sub>e</sub>(t)</li>
+              <li><b>x<sub>o</sub></b> odd part, x<sub>o</sub>(−t) = −x<sub>o</sub>(t)</li>
+              <li><b>x</b> original signal, x = x<sub>e</sub> + x<sub>o</sub></li>
+            </ul>
+            <p class="fx-note">The same formulas hold for sequences with n in place of t. The decomposition is unique.</p>
+          </div>
+          <div class="formula">
+            <div class="fx-name"><span>Products and symmetry</span><span class="tag">M1</span></div>
+            <div class="math">even × even = even, &nbsp; odd × odd = even, &nbsp; even × odd = odd</div>
+            <ul class="fx-symbols">
+              <li><b>even</b> unchanged by time reversal</li>
+              <li><b>odd</b> negated by time reversal</li>
+            </ul>
+            <p class="fx-note">These rules let you predict the symmetry of a product before plotting it. They are used constantly in Fourier analysis, where even signals produce cosine terms and odd signals produce sine terms.</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 1.1</span><h4>Decompose a one-sided exponential</h4></div>
+          <div class="example-body">
+            <p class="given">Given <span class="mono">x(t) = e<sup>−2t</sup>u(t)</span>, find its even and odd parts and sketch them.</p>
+            <ol class="steps">
+              <li>Write the time-reversed signal. Since <span class="mono">u(t)</span> is 1 for <span class="mono">t ≥ 0</span>, <span class="mono">x(−t) = e<sup>2t</sup>u(−t)</span>, which is nonzero only for <span class="mono">t ≤ 0</span>.</li>
+              <li>Apply the decomposition: <span class="mono">x<sub>e</sub>(t) = ½[e<sup>−2t</sup>u(t) + e<sup>2t</sup>u(−t)] = ½e<sup>−2|t|</sup></span>.</li>
+              <li>For the odd part, <span class="mono">x<sub>o</sub>(t) = ½[e<sup>−2t</sup>u(t) − e<sup>2t</sup>u(−t)]</span>. For <span class="mono">t &gt; 0</span> this is <span class="mono">½e<sup>−2t</sup></span>; for <span class="mono">t &lt; 0</span> it is <span class="mono">−½e<sup>2t</sup></span>. Equivalently <span class="mono">x<sub>o</sub>(t) = ½ sgn(t)e<sup>−2|t|</sup></span>.</li>
+              <li>Check: at <span class="mono">t = 0</span>, <span class="mono">x<sub>e</sub>(0) = ½</span> and <span class="mono">x<sub>o</sub>(0) = 0</span>, so their sum is 1, which equals <span class="mono">x(0⁺)</span>. At <span class="mono">t = 1</span>, <span class="mono">x<sub>e</sub> = ½e<sup>−2</sup> ≈ 0.0677</span> and <span class="mono">x<sub>o</sub> = 0.0677</span>; the sum is <span class="mono">0.1353 = e<sup>−2</sup></span>, as required.</li>
+            </ol>
+          </div>
+          <div class="result"><b>Result.</b> The even part is a two-sided exponential <span class="mono">½e<sup>−2|t|</sup></span>; the odd part is the same envelope with opposite signs on the two sides. The original signal is their sum.</div>
+        </div>
+
+        <h3>Periodicity, energy and power</h3>
+        <div class="prose">
+          <p>A continuous-time signal is <strong>periodic</strong> with period <span class="mono">T</span> if <span class="mono">x(t+T) = x(t)</span> for every <span class="mono">t</span>. The <strong>fundamental period</strong> <span class="mono">T₀</span> is the smallest positive value for which this holds. A constant signal is periodic for every <span class="mono">T</span>, so it has no fundamental period. A discrete-time signal is periodic with period <span class="mono">N</span> if <span class="mono">x[n+N] = x[n]</span> for every integer <span class="mono">n</span>; <span class="mono">N</span> must be an integer.</p>
+          <p>Periodicity of a sum is more delicate than it looks. If <span class="mono">x₁</span> has period <span class="mono">T₁</span> and <span class="mono">x₂</span> has period <span class="mono">T₂</span>, their sum is periodic only when the ratio <span class="mono">T₁/T₂</span> is a rational number. The fundamental period is then the least common multiple of <span class="mono">T₁</span> and <span class="mono">T₂</span>. For a discrete-time sinusoid <span class="mono">cos(Ω₀n)</span>, the condition is that <span class="mono">Ω₀/(2π)</span> is rational.</p>
+        </div>
+
+        <div class="formula-grid">
+          <div class="formula">
+            <div class="fx-name"><span>Energy and average power</span><span class="tag">M1</span></div>
+            <div class="math">E = <span class="op">∫</span><sub>−∞</sub><sup>∞</sup> |x(t)|² dt, &nbsp; P = <span class="op">lim</span><sub>T→∞</sub> <span class="frac"><span>1</span><span>2T</span></span> <span class="op">∫</span><sub>−T</sub><sup>T</sup> |x(t)|² dt</div>
+            <ul class="fx-symbols">
+              <li><b>E</b> total energy, joules for a voltage across 1 Ω</li>
+              <li><b>P</b> average power, watts under the same convention</li>
+              <li><b>|x|²</b> instantaneous power (normalised to 1 Ω)</li>
+            </ul>
+            <p class="fx-note">A signal is an energy signal if 0 &lt; E &lt; ∞ (then P = 0); a power signal if 0 &lt; P &lt; ∞ (then E = ∞). A periodic signal with finite energy per period is a power signal, and its power may be computed over one period.</p>
+          </div>
+          <div class="formula">
+            <div class="fx-name"><span>Power of a sinusoid</span><span class="tag">M1</span></div>
+            <div class="math">x(t) = A cos(ω₀t + φ) &nbsp;⇒&nbsp; P = <span class="frac"><span>A²</span><span>2</span></span></div>
+            <ul class="fx-symbols">
+              <li><b>A</b> peak amplitude</li>
+              <li><b>ω₀</b> angular frequency, rad/s</li>
+              <li><b>φ</b> phase offset, radians</li>
+            </ul>
+            <p class="fx-note">The result follows from averaging cos² over a period: the mean of cos² is ½. RMS amplitude is A/√2.</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 1.2</span><h4>Is this sum periodic?</h4></div>
+          <div class="example-body">
+            <p class="given">Consider <span class="mono">x(t) = cos(2π·3t) + cos(2π·5t)</span>. Find the fundamental period and fundamental frequency.</p>
+            <ol class="steps">
+              <li>The first term has period <span class="mono">T₁ = 1/3 s</span>; the second has <span class="mono">T₂ = 1/5 s</span>.</li>
+              <li>Form the ratio <span class="mono">T₁/T₂ = (1/3)/(1/5) = 5/3</span>, a rational number, so the sum is periodic.</li>
+              <li>The fundamental period is the least common multiple: the smallest <span class="mono">T</span> that is an integer multiple of both <span class="mono">1/3</span> and <span class="mono">1/5</span>. The LCM of the fractions is <span class="mono">1 s</span>.</li>
+              <li>Hence <span class="mono">f₀ = 1/T₀ = 1 Hz</span>. The two components are the third and fifth harmonics of that fundamental.</li>
+            </ol>
+          </div>
+          <div class="result"><b>Result.</b> <span class="mono">T₀ = 1 s</span>, <span class="mono">f₀ = 1 Hz</span>. If the second frequency had been <span class="mono">√2</span> rather than 5, the ratio would be irrational and the sum would not be periodic, even though both terms are.</div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m1-s3">
+        <h2>1.3 The basic continuous-time signals</h2>
+        <div class="prose">
+          <p>Six signals do most of the work in signals and systems. They are not arbitrary examples: every other signal can be built from them by scaling, shifting and superposition.</p>
+          <ul>
+            <li><strong>Unit step</strong> <span class="mono">u(t)</span>: 0 for <span class="mono">t &lt; 0</span>, 1 for <span class="mono">t &gt; 0</span>. At <span class="mono">t = 0</span> the value is undefined or taken as ½ by convention. It models a switch closing at time zero.</li>
+            <li><strong>Unit impulse</strong> <span class="mono">δ(t)</span>: a generalised function with unit area concentrated at the origin. It is not a function in the ordinary sense; its meaning comes from what it does inside an integral.</li>
+            <li><strong>Ramp</strong> <span class="mono">r(t) = t u(t)</span>: zero before zero, then slope 1.</li>
+            <li><strong>Exponential</strong> <span class="mono">e<sup>−at</sup>u(t)</span>: the natural response of a first-order system. For <span class="mono">a &gt; 0</span> it decays with time constant <span class="mono">1/a</span>.</li>
+            <li><strong>Sinusoid</strong> <span class="mono">A cos(ω₀t + φ)</span>: the natural response of an undamped second-order system and the building block of Fourier analysis.</li>
+            <li><strong>Rectangular pulse</strong> <span class="mono">rect(t/T)</span>: 1 for <span class="mono">|t| &lt; T/2</span>, 0 outside. Its Fourier transform is a sinc, which links time width to bandwidth.</li>
+          </ul>
+        </div>
+
+        <div class="formula-grid">
+          <div class="formula">
+            <div class="fx-name"><span>Step and impulse</span><span class="tag">M1</span></div>
+            <div class="math">u(t) = <span class="op">∫</span><sub>−∞</sub><sup>t</sup> δ(τ)dτ, &nbsp; δ(t) = <span class="frac"><span>du(t)</span><span>dt</span></span></div>
+            <ul class="fx-symbols">
+              <li><b>δ(t)</b> unit impulse, area 1</li>
+              <li><b>u(t)</b> unit step, height 1</li>
+            </ul>
+            <p class="fx-note">The derivative is interpreted in the generalised-function sense at the jump. Scaling rule: δ(at) = δ(t)/|a|.</p>
+          </div>
+          <div class="formula">
+            <div class="fx-name"><span>Sifting property</span><span class="tag">M1</span></div>
+            <div class="math"><span class="op">∫</span><sub>−∞</sub><sup>∞</sup> x(t) δ(t − t₀) dt = x(t₀)</div>
+            <ul class="fx-symbols">
+              <li><b>x(t)</b> test signal, continuous at t₀</li>
+              <li><b>t₀</b> location of the impulse</li>
+            </ul>
+            <p class="fx-note">This is the single most useful property of the impulse. It says an impulse samples the signal at the point where it sits. Convolution and sampling both rest on it.</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 1.3</span><h4>Evaluate an impulse integral</h4></div>
+          <div class="example-body">
+            <p class="given">Evaluate <span class="mono">I = ∫<sub>−∞</sub><sup>∞</sup> (t² + 1) δ(2 − t) dt</span>.</p>
+            <ol class="steps">
+              <li>The impulse is located where its argument is zero: <span class="mono">2 − t = 0</span>, so <span class="mono">t₀ = 2</span>.</li>
+              <li>By the sifting property, the integral equals the integrand evaluated at <span class="mono">t₀ = 2</span>.</li>
+              <li><span class="mono">I = (2² + 1) = 5</span>.</li>
+              <li>Check the scaling rule. If the impulse is written as <span class="mono">δ(2 − t) = δ(−(t − 2)) = δ(t − 2)</span>, the coefficient is 1 because the argument has slope magnitude 1, so no extra factor appears.</li>
+            </ol>
+          </div>
+          <div class="result"><b>Result.</b> <span class="mono">I = 5</span>. The impulse does not care about the shape of <span class="mono">t² + 1</span> anywhere except at <span class="mono">t = 2</span>.</div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m1-s4">
+        <h2>1.4 Discrete-time signals</h2>
+        <div class="prose">
+          <p>A discrete-time signal is a sequence of numbers indexed by an integer. It may arise from sampling a continuous signal, from a naturally discrete process such as a daily reading, or from a numerical simulation. The index <span class="mono">n</span> has no units; if the sequence comes from uniform sampling, sample <span class="mono">n</span> occurs at time <span class="mono">nT<sub>s</sub></span>.</p>
+          <p>The discrete-time unit impulse is <span class="mono">δ[n] = 1</span> at <span class="mono">n = 0</span> and zero elsewhere. The unit step is <span class="mono">u[n] = 1</span> for <span class="mono">n ≥ 0</span> and zero for <span class="mono">n &lt; 0</span>. Unlike their continuous counterparts, both are perfectly ordinary sequences. Any sequence can be written as a sum of scaled and shifted impulses:</p>
+        </div>
+        <div class="formula-grid">
+          <div class="formula">
+            <div class="fx-name"><span>Impulse decomposition of a sequence</span><span class="tag">M1</span></div>
+            <div class="math">x[n] = <span class="op">Σ</span><sub>k=−∞</sub><sup>∞</sup> x[k] δ[n − k]</div>
+            <ul class="fx-symbols">
+              <li><b>x[k]</b> sample value at index k</li>
+              <li><b>δ[n − k]</b> impulse centred at k</li>
+            </ul>
+            <p class="fx-note">This identity is the discrete counterpart of the sifting integral. It is the starting point for the convolution sum in module 2.</p>
+          </div>
+          <div class="formula">
+            <div class="fx-name"><span>Discrete-time periodicity</span><span class="tag">M1</span></div>
+            <div class="math">x[n] = cos(Ω₀n) is periodic ⇔ <span class="frac"><span>Ω₀</span><span>2π</span></span> = <span class="frac"><span>m</span><span>N</span></span> (rational)</div>
+            <ul class="fx-symbols">
+              <li><b>Ω₀</b> discrete angular frequency, rad/sample</li>
+              <li><b>m, N</b> coprime integers</li>
+              <li><b>N</b> fundamental period in samples</li>
+            </ul>
+            <p class="fx-note">Unlike a continuous sinusoid, a discrete sinusoid is not necessarily periodic. For example cos(3n) is aperiodic because 3/(2π) is irrational.</p>
+          </div>
+        </div>
+
+        <div class="callout key">
+          <div class="co-icon">✓</div>
+          <div><h4>Check yourself</h4>
+          <p>What is the fundamental period of <span class="mono">x[n] = cos(0.2πn)</span>? Here <span class="mono">Ω₀/(2π) = 0.1 = 1/10</span>, so the fundamental period is <span class="mono">N = 10</span> samples. At <span class="mono">n = 10</span> the phase has advanced by <span class="mono">2π</span>. If you answered <span class="mono">0.1</span>, you have reported the normalised frequency, not the period.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m1-s5">
+        <h2>1.5 Classifying systems by testing, not by name</h2>
+        <div class="prose">
+          <p>A system is memoryless if its output at any instant depends only on the input at that instant. It is causal if the output depends only on present and past inputs, never on future ones. It is stable in the bounded-input bounded-output (BIBO) sense if every bounded input produces a bounded output. It is linear if it obeys superposition, and time-invariant if a delay in the input produces exactly the same delay in the output.</p>
+          <p>These are five independent questions. A system can be causal and unstable, linear and time-varying, or stable and nonlinear. The tests below are written as procedures because the exam question is almost always a procedure, not a definition.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card card-flat">
+            <h3>Linearity</h3>
+            <p class="small muted">For any inputs <span class="mono">x₁, x₂</span> and any constants <span class="mono">a, b</span>:</p>
+            <div class="math">T{ax₁ + bx₂} = aT{x₁} + bT{x₂}</div>
+            <p class="small muted mb-0">Equivalently, test additivity and homogeneity separately. A system with a nonzero offset, such as <span class="mono">y = x + 1</span>, fails homogeneity: doubling the input does not double the output.</p>
+          </div>
+          <div class="card card-flat">
+            <h3>Time-invariance</h3>
+            <p class="small muted">If <span class="mono">x(t) → y(t)</span>, then for every shift <span class="mono">t₀</span>:</p>
+            <div class="math">x(t − t₀) → y(t − t₀)</div>
+            <p class="small muted mb-0">Shift the input first, then apply the system; compare with applying the system first, then shifting the output. If the two results differ, the system is time-varying.</p>
+          </div>
+          <div class="card card-flat">
+            <h3>Causality</h3>
+            <p class="small muted">The output at time <span class="mono">t</span> may use <span class="mono">x(τ)</span> only for <span class="mono">τ ≤ t</span>.</p>
+            <p class="small muted mb-0">For an LTI system, causality is equivalent to <span class="mono">h(t) = 0</span> for <span class="mono">t &lt; 0</span>. A system that uses <span class="mono">x(t + 1)</span> is noncausal and cannot run in real time, although it can be simulated offline.</p>
+          </div>
+          <div class="card card-flat">
+            <h3>BIBO stability</h3>
+            <p class="small muted">There exist finite <span class="mono">M, K</span> such that <span class="mono">|x(t)| ≤ M</span> for all <span class="mono">t</span> implies <span class="mono">|y(t)| ≤ K</span>.</p>
+            <p class="small muted mb-0">For an LTI system the test is absolute integrability: <span class="mono">∫|h(t)|dt &lt; ∞</span>. The integrator <span class="mono">y(t) = ∫<sub>−∞</sub><sup>t</sup>x(τ)dτ</span> is not BIBO stable because a constant input produces an unbounded ramp.</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 1.4</span><h4>Test <span class="mono">y(t) = x(1 − t)</span></h4></div>
+          <div class="example-body">
+            <p class="given">Decide whether the system is memoryless, causal, BIBO stable, linear and time-invariant.</p>
+            <ol class="steps">
+              <li><strong>Memory:</strong> the output at <span class="mono">t</span> uses the input at <span class="mono">1 − t</span>, which is generally not <span class="mono">t</span>; the system has memory.</li>
+              <li><strong>Causality:</strong> at <span class="mono">t = 0</span>, the output uses <span class="mono">x(1)</span>, a future value. The system is noncausal.</li>
+              <li><strong>Stability:</strong> if <span class="mono">|x| ≤ M</span>, then <span class="mono">|y| = |x(1 − t)| ≤ M</span>; the system is BIBO stable.</li>
+              <li><strong>Linearity:</strong> <span class="mono">T{ax₁ + bx₂} = ax₁(1 − t) + bx₂(1 − t) = aT{x₁} + bT{x₂}</span>. Linear.</li>
+              <li><strong>Time-invariance:</strong> shift the input by <span class="mono">t₀</span>: <span class="mono">T{x(t − t₀)} = x(1 − t − t₀)</span>. Now shift the original output: <span class="mono">y(t − t₀) = x(1 − (t − t₀)) = x(1 − t + t₀)</span>. The two differ unless <span class="mono">t₀ = 0</span>. Time-varying.</li>
+            </ol>
+          </div>
+          <div class="result"><b>Result.</b> The system is linear, stable, noncausal, has memory and is time-varying. The sign of the <span class="mono">t</span> inside the argument is what breaks time-invariance; a pure delay <span class="mono">x(t − 1)</span> would be time-invariant.</div>
+        </div>
+
+        <div class="callout trap">
+          <div class="co-icon">!</div>
+          <div><h4>Common error</h4>
+          <p>Testing time-invariance by checking whether <span class="mono">y(t) = x(t − 1)</span> "looks shifted" is not enough. Write both sides: <span class="mono">T{x(t − t₀)}</span> and <span class="mono">y(t − t₀)</span>. A system with a time-dependent coefficient, such as <span class="mono">y(t) = t x(t)</span>, is linear but time-varying because the multiplier changes with the observation time.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m1-proj">
+        <h2>1.6 Watch a signal split into its even and odd halves</h2>
+        <div class="prose">
+          <p>The projection below takes a fixed waveform, reflects it in time, and adds and subtracts the two versions. Use Step to advance one stage at a time; use Play to watch the construction continuously. The first frame is a complete static explanation, so nothing is lost if motion is reduced.</p>
+        </div>
+        <div class="projection" data-projection="signals">
+          <noscript><div class="live-note"><b>Static version:</b> a waveform x(t) is reflected to form x(−t). Adding the two and halving gives the even part; subtracting and halving gives the odd part. Their sum reconstructs x(t).</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m1-lab">
+        <h2>1.7 Lab — Signal Studio</h2>
+        <div class="prose">
+          <p>Change the waveform and its parameters and watch the even and odd parts respond. The readouts are computed from the same samples that are plotted, so the numbers and the curves cannot disagree.</p>
+        </div>
+        <div class="lab" data-lab="signal"></div>
+      </section>
+
+      <section class="lesson-section" id="m1-simple">
+        <h2>1.8 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>A signal is just a quantity that changes — a voltage, a sound pressure, a temperature. Drawing it as a graph of value against time lets us talk about its size, its rhythm and its shape.</p>
+          <p>Some signals repeat exactly. The time one full repeat takes is the period; the number of repeats per second is the frequency. They are reciprocals: a period of 0.01 s means 100 repeats per second.</p>
+          <p>Any signal can be split into a part that is the same when played backwards (even) and a part that is exactly reversed (odd). This is not a physical trick; it is a bookkeeping device that makes Fourier analysis and convolution easier.</p>
+          <p>A system is a machine that turns an input signal into an output signal. The important properties are simple questions: does it remember the past, does it need the future, does it stay bounded, does it respect scaling and addition, and does it behave the same on Tuesday as on Monday? The answers are the five tests in section 1.5.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>If <span class="mono">x(t)</span> is a voltage and <span class="mono">x²(t)</span> is its instantaneous power across a 1 Ω resistor, then the area under <span class="mono">x²(t)</span> is energy. A sine wave that never stops has infinite area (infinite energy) but a finite average height (finite power). This is why periodic signals are power signals, not energy signals.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>The even/odd decomposition is the first example of a broader idea: projecting a signal onto orthogonal subspaces. The even and odd parts are orthogonal under the inner product <span class="mono">⟨f,g⟩ = ∫f(t)g(t)dt</span>, and <span class="mono">x = x<sub>e</sub> + x<sub>o</sub></span> is an orthogonal decomposition. Fourier series performs the same operation with sinusoids as the basis, and the z-transform does it with complex exponentials. Recognising the pattern now will make the transform chapters feel less like a collection of formulas.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 1</h3>
+            <ul class="small">
+              <li><b>Even/odd:</b> x<sub>e</sub> = ½(x(t)+x(−t)), x<sub>o</sub> = ½(x(t)−x(−t)), x = x<sub>e</sub> + x<sub>o</sub>.</li>
+              <li><b>Periodicity:</b> smallest T with x(t+T)=x(t); for sums, T₁/T₂ must be rational.</li>
+              <li><b>Power:</b> P = A²/2 for A cos(ω₀t+φ); energy signals have finite E and zero average power.</li>
+              <li><b>Impulse:</b> ∫x(t)δ(t−t₀)dt = x(t₀); δ(t) = du/dt.</li>
+              <li><b>System tests:</b> memory, causality, BIBO stability, linearity, time-invariance — each independent.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m1-check">
+        <h2>1.9 Checkpoint</h2>
+        <div class="prose"><p>Five questions drawn from this module's Intermediate band. Answer before revealing the solution; the hint is free and does not reduce your score.</p></div>
+        <div class="checkpoint" data-checkpoint="1"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

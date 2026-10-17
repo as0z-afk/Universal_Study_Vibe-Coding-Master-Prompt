@@ -1,0 +1,179 @@
+<article class="module-page" id="module-7" data-module="7" data-title="The z-Transform and Discrete-Time Systems" data-promise="Turn a difference equation into a z-domain system function and read stability from the unit circle." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 7</span>
+      <span class="pill">Discrete time</span>
+      <span class="pill">6 concepts</span>
+    </div>
+    <h1>The z-Transform and Discrete-Time Systems</h1>
+    <p class="promise">A difference equation is the discrete cousin of a differential equation. The z-transform turns it into a rational function, and the unit circle then answers every stability and frequency question at once.</p>
+    <ul class="outcomes">
+      <li>Transform the standard discrete sequences and use the shift property on difference equations.</li>
+      <li>Explain why the ROC is an annulus and how it relates to causality and stability.</li>
+      <li>Invert a rational z-transform by partial fractions and by long division.</li>
+      <li>Read the impulse response and the frequency response from the pole–zero pattern.</li>
+      <li>Explain how the DFT samples the z-transform on the unit circle.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>A digital filter is described by three coefficients: 1, −1.6 and 0.64. Its sampling rate is 8 kHz. Without plotting anything, can you say whether it rings, how fast it rings, and whether it is stable? The three numbers are enough — if you know where to look.</p>
+      <p>Section 7.5 puts those coefficients on the z-plane and answers all three questions from the pole radius and angle.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m7-s1">
+        <h2>7.1 Why discrete systems need their own transform</h2>
+        <div class="prose">
+          <p>A discrete-time LTI system is described by a difference equation, such as <span class="mono">y[n] = x[n] − 0.5y[n−1]</span>. The output depends on the present input and on past outputs. Iterating the equation gives the impulse response; the z-transform gives it in closed form.</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Two-sided z-transform</span><span class="tag">CORE</span></div>
+              <div class="math">X(z) = Σ<sub>n=−∞</sub><sup>∞</sup> x[n]z<sup>−n</sup></div>
+              <ul class="fx-symbols">
+                <li><b>z</b> a complex variable, z = re<sup>jω</sup></li>
+                <li><b>|z| = 1</b> the unit circle, where the transform becomes the DTFT</li>
+                <li><b>z<sup>−1</sup></b> a delay of one sample</li>
+              </ul>
+              <p class="fx-note">The transform is a power series in z<sup>−1</sup>. It converges where that series converges, which is an annulus centred on the origin.</p>
+            </div>
+          </div>
+          <p>The delay property is the workhorse. If <span class="mono">x[n] ↔ X(z)</span>, then <span class="mono">x[n−k] ↔ z<sup>−k</sup>X(z)</span>. Apply it to every term of a difference equation, solve for <span class="mono">Y(z)/X(z)</span>, and the system function appears as a rational function of z.</p>
+          <p>The substitution <span class="mono">z = e<sup>jω</sup></span> evaluates the transform on the unit circle and produces the discrete-time Fourier transform. The frequency response is therefore a slice through the z-plane, and the angle ω is the normalised frequency in radians per sample.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m7-s2">
+        <h2>7.2 Pairs, properties and the meaning of z<sup>−1</sup></h2>
+        <div class="prose">
+          <p>Every z-domain expression should be read as a recipe for samples. A factor of <span class="mono">z<sup>−1</sup></span> is a one-sample delay; a pole at <span class="mono">a</span> is a geometric decay <span class="mono">a<sup>n</sup></span>; a zero at <span class="mono">b</span> is a subtraction of a delayed and scaled copy.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Standard z-transform pairs, all right-sided</caption>
+            <thead><tr><th>x[n]</th><th>X(z)</th><th>ROC</th></tr></thead>
+            <tbody>
+              <tr><td>δ[n]</td><td>1</td><td>All z</td></tr>
+              <tr><td>δ[n−k]</td><td>z<sup>−k</sup></td><td>All z except 0 or ∞</td></tr>
+              <tr><td>u[n]</td><td>z/(z−1)</td><td>|z| &gt; 1</td></tr>
+              <tr><td>a<sup>n</sup>u[n]</td><td>z/(z−a)</td><td>|z| &gt; |a|</td></tr>
+              <tr><td>n a<sup>n</sup>u[n]</td><td>az/(z−a)²</td><td>|z| &gt; |a|</td></tr>
+              <tr><td>cos(ω₀n)u[n]</td><td>z(z−cos ω₀)/(z²−2z cos ω₀+1)</td><td>|z| &gt; 1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The shift property, linearity and the convolution property (convolution in n becomes multiplication in z) are enough for most problems. The initial-value theorem is simpler than in continuous time: <span class="mono">x[0] = lim<sub>z→∞</sub>X(z)</span> when the transform is proper. The final-value theorem requires all poles of <span class="mono">(z−1)X(z)</span> to lie inside the unit circle.</p>
+      </section>
+
+      <section class="lesson-section" id="m7-s3">
+        <h2>7.3 The unit circle is the stability boundary</h2>
+        <div class="prose">
+          <p>In the s-plane the stability boundary is the imaginary axis. Under the mapping <span class="mono">z = e<sup>sT</sup></span> that axis wraps onto the unit circle, the left half-plane maps inside the circle and the right half-plane maps outside it. Every stability statement transfers directly.</p>
+          <ul class="tight">
+            <li><strong>Stable:</strong> every pole strictly inside the unit circle, |p<sub>k</sub>| &lt; 1.</li>
+            <li><strong>Marginally stable:</strong> simple poles on the circle, |p<sub>k</sub>| = 1, and none outside.</li>
+            <li><strong>Unstable:</strong> at least one pole outside the circle, |p<sub>k</sub>| &gt; 1, or a repeated pole on the circle.</li>
+          </ul>
+          <p>The ROC of a causal system is the exterior of the largest pole. If that region includes the unit circle, the system is stable. This is why a single glance at the pole radius answers the question: a pole at 0.9 decays, a pole at 1.1 grows, and a pole at exactly 1 oscillates forever or accumulates.</p>
+          <p>Second-order systems add one more visual cue: the pole angle sets the ringing frequency. A pole at radius r and angle θ produces a damped oscillation whose envelope decays as r<sup>n</sup> and whose period is <span class="mono">2π/θ</span> samples.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m7-s4">
+        <h2>7.4 From difference equation to difference equation</h2>
+        <div class="prose">
+          <p>The round trip is the core skill. Given <span class="mono">y[n] − 0.8y[n−1] = x[n]</span>, transform both sides: <span class="mono">Y(z)(1 − 0.8z<sup>−1</sup>) = X(z)</span>, so <span class="mono">H(z) = 1/(1 − 0.8z<sup>−1</sup>) = z/(z − 0.8)</span>. The impulse response is <span class="mono">0.8<sup>n</sup>u[n]</span>, and the pole at 0.8 is inside the unit circle, so the system is stable.</p>
+          <p>Going the other way, multiply numerator and denominator by powers of z until both are polynomials in positive powers. The coefficients of the denominator give the feedback coefficients of the recursion; the coefficients of the numerator give the feedforward coefficients. A direct-form implementation is literally a delay line with these coefficients.</p>
+          <p>Partial fractions invert a rational transform into a sum of geometric sequences. For distinct poles, <span class="mono">H(z)/z</span> is expanded first, then each term is matched to <span class="mono">z/(z−p)</span>. Dividing by z before expanding is the standard trick because the numerator of every basic pair contains a factor z.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 7.1</span><h4>Iterate, then verify in the z-domain</h4></div>
+          <div class="example-body">
+            <p>A system has <span class="mono">y[n] = 0.7y[n−1] + x[n]</span> and <span class="mono">y[−1] = 0</span>. Find y[3] for a unit impulse.</p>
+            <p><b>Iterate.</b> y[0] = 0.7·0 + 1 = 1; y[1] = 0.7; y[2] = 0.49; y[3] = 0.343.</p>
+            <p><b>Closed form.</b> h[n] = 0.7<sup>n</sup>u[n], so h[3] = 0.7³ = 0.343. The two routes agree.</p>
+            <p><b>Stability.</b> The pole is at z = 0.7, inside the unit circle. The impulse response decays, the system is stable, and the DC gain is H(1) = 1/(1 − 0.7) = 3.333.</p>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 7.2</span><h4>Inverse z by partial fractions</h4></div>
+          <div class="example-body">
+            <p>Find the causal inverse of <span class="mono">H(z) = z/(z² − 1.5z + 0.5)</span>.</p>
+            <p><b>Factor the denominator.</b> z² − 1.5z + 0.5 = (z − 1)(z − 0.5). Both poles are on or inside the unit circle; the pole at 1 makes the system marginally stable, not stable.</p>
+            <p><b>Expand H(z)/z.</b> 1/[(z−1)(z−0.5)] = A/(z−1) + B/(z−0.5). Cover z = 1: A = 1/0.5 = 2. Cover z = 0.5: B = 1/(0.5−1) = −2.</p>
+            <p><b>Reconstruct.</b> H(z) = 2z/(z−1) − 2z/(z−0.5), so h[n] = 2(1 − 0.5<sup>n</sup>)u[n]. The response tends to 2, a constant, which is consistent with a pole at z = 1 and a DC gain of 2.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m7-s5">
+        <h2>7.5 Frequency response and the DFT</h2>
+        <div class="prose">
+          <p>Evaluating <span class="mono">H(z)</span> on the unit circle gives the frequency response. As the angle θ moves from 0 to π, the frequency moves from DC to the Nyquist frequency. A pole near the circle at angle θ₀ produces a resonant peak near that frequency; a zero on the circle produces a perfect null.</p>
+          <p>The discrete Fourier transform is the z-transform sampled at N equally spaced points on the unit circle: <span class="mono">z<sub>k</sub> = e<sup>j2πk/N</sup></span>. This is why the DFT is periodic with period N and why frequency resolution improves with longer records. It also explains spectral leakage: a frequency that does not fall exactly on a sample point spreads energy across neighbouring bins.</p>
+          <p>The sampling rate sets the meaningful frequency range. Frequencies above half the sampling rate alias, so the digital filter can only shape the band from 0 to f<sub>s</sub>/2. A pole angle of π corresponds to f<sub>s</sub>/2; an angle of π/2 corresponds to f<sub>s</sub>/4.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m7-proj">
+        <h2>7.6 Watch the poles and the samples</h2>
+        <div class="prose">
+          <p>The projection places a conjugate pole pair on the z-plane and shows the impulse response it generates. Move the pair toward the circle to see the ringing decay more slowly; move it outside to see growth.</p>
+        </div>
+        <div class="projection" data-projection="ztransform">
+          <noscript><div class="live-note"><b>Static version:</b> a pole at radius r and angle θ produces a damped oscillation r<sup>n</sup>cos(θn). Inside the unit circle the samples decay; outside they grow; on the circle they continue forever.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m7-lab">
+        <h2>7.7 Lab — z-Plane Designer</h2>
+        <div class="prose">
+          <p>Edit the difference-equation coefficients and watch the poles, the impulse response and the magnitude response update together. The lab simulates the recursion directly, so the plotted samples are the actual output, not a sketch.</p>
+        </div>
+        <div class="lab" data-lab="z"></div>
+      </section>
+
+      <section class="lesson-section" id="m7-simple">
+        <h2>7.8 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>In discrete time a system works sample by sample. The z-transform is a bookkeeping trick that turns the endless chain of "multiply the previous output by a and add the new input" into a single fraction.</p>
+          <p>The fraction's denominator has roots called poles. A pole inside the unit circle means the effect of an old sample fades away. A pole outside means it grows. A pole exactly on the circle means it never fades — a permanent ring or a constant offset.</p>
+          <p>The angle of the pole tells you the pitch of the ring: small angles are slow wiggles, angles near 180° are fast alternations. The radius tells you how long the ring lasts. Digital filter design is largely the art of placing poles and zeros where you want those two effects.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>For <span class="mono">H(z) = z/(z − 0.9)</span>, h[n] = 0.9<sup>n</sup>. After 10 samples the response is 0.9<sup>10</sup> = 0.349, after 20 samples 0.122. A pole at 0.9 is stable but slow. Moving it to 0.5 makes the response decay to 0.001 after 10 samples — faster, but with a wider bandwidth.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>The z-transform and the Laplace transform are related by <span class="mono">z = e<sup>sT</sup></span>. The left half-plane maps inside the unit circle, the imaginary axis maps onto the circle, and horizontal strips of width 2π/T map onto the whole plane repeatedly. This many-to-one mapping is exactly aliasing in the frequency domain: different continuous frequencies that differ by multiples of the sampling rate land on the same z. Understanding the map makes the sampling theorem in Module 8 feel inevitable rather than arbitrary.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 7</h3>
+            <ul class="small">
+              <li><b>Pairs:</b> δ[n]→1, u[n]→z/(z−1), a<sup>n</sup>u[n]→z/(z−a).</li>
+              <li><b>Shift:</b> x[n−k] ↔ z<sup>−k</sup>X(z).</li>
+              <li><b>Stability:</b> all poles strictly inside |z| = 1.</li>
+              <li><b>Frequency:</b> z = e<sup>jω</sup>; pole angle sets ringing frequency, radius sets decay.</li>
+              <li><b>DFT:</b> samples of X(z) at N equally spaced points on the unit circle.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m7-check">
+        <h2>7.9 Checkpoint</h2>
+        <div class="prose"><p>Five questions from this module's Intermediate band. Answer before revealing the solution.</p></div>
+        <div class="checkpoint" data-checkpoint="7"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>

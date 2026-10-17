@@ -1,0 +1,228 @@
+<article class="module-page" id="module-8" data-module="8" data-title="Sampling, Digital Transmission and Capacity" data-promise="Sample without aliasing, choose levels, and compute the Nyquist and Shannon limits of a real channel." hidden>
+  <header class="module-head">
+    <div class="mh-top">
+      <span class="pill teal">Module 8</span>
+      <span class="pill">Digitisation</span>
+      <span class="pill">6 concepts</span>
+    </div>
+    <h1>Sampling, Digital Transmission and Capacity</h1>
+    <p class="promise">Turning an analog signal into bits requires three decisions: how often to sample, how finely to quantise and how many levels to transmit. Each decision has a hard limit, and the limits are computable.</p>
+    <ul class="outcomes">
+      <li>State and apply the sampling theorem, and compute alias frequencies.</li>
+      <li>Explain anti-alias filtering and why it must precede the sampler.</li>
+      <li>Compute PCM bit rate, quantisation step and signal-to-quantisation-noise ratio.</li>
+      <li>Apply the Nyquist bit-rate formula for a noiseless channel.</li>
+      <li>Apply Shannon's capacity formula and explain why it is a bound rather than a recipe.</li>
+    </ul>
+    <div class="hook">
+      <span class="q-label">Start with a question</span>
+      <p>A 20 kHz audio signal is sampled at 30 kHz and reconstructed. The result contains a tone that was never in the original. Where did it come from, and at what frequency does it appear? The answer is not a malfunction — it is arithmetic.</p>
+      <p>Section 8.2 folds the spectrum and finds the intruder. Section 8.3 shows how quantisation adds a second, unavoidable kind of error.</p>
+    </div>
+  </header>
+
+  <div class="module-layout">
+    <div class="lesson">
+
+      <section class="lesson-section" id="m8-s1">
+        <h2>8.1 The sampling theorem</h2>
+        <div class="prose">
+          <p>Sampling converts a continuous signal into a sequence of numbers. Intuitively, information is lost: infinitely many values between samples are discarded. The sampling theorem says that no information is lost <em>if</em> the signal is bandlimited and the samples are taken fast enough.</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Nyquist–Shannon sampling theorem</span><span class="tag">CORE</span></div>
+              <div class="math">f<sub>s</sub> ≥ 2f<sub>m</sub></div>
+              <ul class="fx-symbols">
+                <li><b>f<sub>s</sub></b> sampling rate, samples per second</li>
+                <li><b>f<sub>m</sub></b> highest frequency present in the signal</li>
+                <li><b>2f<sub>m</sub></b> the Nyquist rate</li>
+                <li><b>f<sub>s</sub>/2</b> the Nyquist frequency or folding frequency</li>
+              </ul>
+              <p class="fx-note">The theorem assumes ideal sampling and ideal reconstruction. Practical systems sample above the minimum and use a gradual anti-alias filter, because a real filter cannot cut off infinitely sharply.</p>
+            </div>
+          </div>
+          <p>Sampling multiplies the signal by a train of impulses. In the frequency domain that convolution creates copies of the spectrum centred at every multiple of <span class="mono">f<sub>s</sub></span>. If the copies do not overlap, a low-pass filter can isolate the original. If they overlap, the high-frequency tail of one copy lands inside the baseband of another and cannot be separated.</p>
+          <p>The sampling interval is the reciprocal of the rate: <span class="mono">T<sub>s</sub> = 1/f<sub>s</sub></span>. Sample n is taken at <span class="mono">t = nT<sub>s</sub></span>. The sample index is dimensionless and must never be confused with time — a mistake that produces factor-of-f<sub>s</sub> errors in every frequency calculation.</p>
+        </div>
+        <div class="callout">
+          <div class="co-icon">⚠</div>
+          <div><h4>Anti-alias filtering comes before the sampler</h4>
+          <p>Once aliasing has occurred it cannot be undone. Filtering the digital samples afterwards removes both the alias and the genuine signal at that frequency. The anti-alias filter must be analog, placed before the sampler, and its stopband must begin at or below <span class="mono">f<sub>s</sub>/2</span>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-s2">
+        <h2>8.2 Aliasing: where the extra tone comes from</h2>
+        <div class="prose">
+          <p>An input frequency above <span class="mono">f<sub>s</sub>/2</span> is folded into the baseband. The apparent frequency is the distance from the input to the nearest multiple of the sampling rate:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Alias frequency</span><span class="tag">CORE</span></div>
+              <div class="math">f<sub>alias</sub> = |f − k f<sub>s</sub>|, with k chosen so that 0 ≤ f<sub>alias</sub> ≤ f<sub>s</sub>/2</div>
+              <ul class="fx-symbols">
+                <li><b>f</b> the true input frequency</li>
+                <li><b>k</b> the nearest integer multiple</li>
+                <li><b>f<sub>alias</sub></b> the frequency that appears after sampling</li>
+              </ul>
+              <p class="fx-note">The folding is symmetric about f<sub>s</sub>/2. A tone at 0.6f<sub>s</sub> appears at 0.4f<sub>s</sub>; a tone at 1.4f<sub>s</sub> also appears at 0.4f<sub>s</sub>.</p>
+            </div>
+          </div>
+          <p>Example: a 7 kHz tone sampled at 10 kHz. The nearest multiple of 10 kHz is 10 kHz, so the alias is |7 − 10| = 3 kHz. A reconstruction filter passes 3 kHz, and the listener hears a tone that was never transmitted. The same arithmetic applies to images in a camera, vibration in a machine and every other sampled measurement.</p>
+          <p>Aliasing is not always an error. Undersampling is used deliberately in radio receivers to translate a high-frequency band down to a lower intermediate frequency. The technique works only when the band of interest is narrow and its position is known precisely, so that the folded copy lands in a clean region.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 8.1</span><h4>Find the alias and the cure</h4></div>
+          <div class="example-body">
+            <p>A sensor produces components at 1.2 kHz and 4.5 kHz. It is sampled at 5 kHz. What appears in the baseband?</p>
+            <p><b>Nyquist frequency.</b> f_s/2 = 2.5 kHz. The 1.2 kHz component is below it and passes unchanged.</p>
+            <p><b>Fold the 4.5 kHz component.</b> |4.5 − 5| = 0.5 kHz. The high tone appears as a 0.5 kHz tone, close to the genuine 1.2 kHz signal.</p>
+            <p><b>Cure.</b> Add an analog low-pass filter before the sampler with a cutoff below 2.5 kHz. It must attenuate 4.5 kHz enough that the folded 0.5 kHz component falls below the noise floor. Raising the sampling rate to 10 kHz would also move the Nyquist frequency above 4.5 kHz, but the filter is still needed to remove energy above the new Nyquist frequency.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-s3">
+        <h2>8.3 Quantisation and PCM</h2>
+        <div class="prose">
+          <p>Each sample is still a real number with infinite precision. A quantiser rounds it to one of <span class="mono">L = 2<sup>n</sup></span> levels and encodes the level as n bits. The step size is the full-scale range divided by the number of levels, and the rounding error is at most half a step.</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>PCM bit rate and step size</span><span class="tag">CORE</span></div>
+              <div class="math">R<sub>b</sub> = f<sub>s</sub> · n, &nbsp; Δ = V<sub>FS</sub>/2<sup>n</sup></div>
+              <ul class="fx-symbols">
+                <li><b>n</b> bits per sample</li>
+                <li><b>V<sub>FS</sub></b> full-scale range, volts</li>
+                <li><b>Δ</b> quantisation step</li>
+                <li><b>R<sub>b</sub></b> bit rate, bits per second</li>
+              </ul>
+              <p class="fx-note">Each additional bit halves the step and improves the signal-to-quantisation-noise ratio by about 6 dB. A 16-bit audio system therefore has roughly 96 dB of theoretical dynamic range.</p>
+            </div>
+          </div>
+          <p>Quantisation noise is not the same as channel noise. It is introduced by the converter itself and is approximately uniform over one step. Its power is <span class="mono">Δ²/12</span>. For a full-scale sinusoid the signal-to-quantisation-noise ratio is approximately <span class="mono">6.02n + 1.76</span> dB, the familiar formula behind audio bit-depth specifications.</p>
+          <p>PCM is the combination of sampling, quantisation and binary encoding. Its bit rate is the product of the sample rate and the bit depth. Companding, differential encoding and predictive coding reduce the rate by exploiting signal statistics, but they all trade some fidelity or complexity for fewer bits.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-s4">
+        <h2>8.4 The Nyquist bit rate for a noiseless channel</h2>
+        <div class="prose">
+          <p>If a channel has bandwidth B and the receiver can distinguish L levels, the maximum symbol rate is 2B symbols per second. Each symbol carries log₂L bits, so the maximum bit rate is:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Nyquist bit rate</span><span class="tag">CORE</span></div>
+              <div class="math">C = 2B log₂L</div>
+              <ul class="fx-symbols">
+                <li><b>B</b> channel bandwidth, hertz</li>
+                <li><b>L</b> number of discrete signal levels</li>
+                <li><b>C</b> capacity, bits per second</li>
+              </ul>
+              <p class="fx-note">This formula assumes a noiseless channel and ideal filtering. It says nothing about how much noise the receiver can tolerate; that is Shannon's job.</p>
+            </div>
+          </div>
+          <p>The factor 2 is the Nyquist sampling rate: to reconstruct a signal of bandwidth B you need at least 2B samples per second, and each sample can carry log₂L bits. Doubling the bandwidth doubles the capacity; doubling the number of levels adds only one bit per symbol, which is why bandwidth is the more powerful resource — and the more expensive one.</p>
+          <p>In practice the number of levels is limited by noise and by linearity. A transmitter that uses 256 levels must be extremely linear, and a receiver must resolve 256 distinct amplitudes, which requires a high SNR.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-s5">
+        <h2>8.5 Shannon capacity: the noisy-channel limit</h2>
+        <div class="prose">
+          <p>Real channels add noise. Shannon's theorem gives the maximum rate at which information can be transmitted with arbitrarily small error probability:</p>
+          <div class="formula-grid">
+            <div class="formula">
+              <div class="fx-name"><span>Shannon–Hartley capacity</span><span class="tag">CORE</span></div>
+              <div class="math">C = B log₂(1 + S/N)</div>
+              <ul class="fx-symbols">
+                <li><b>B</b> bandwidth, hertz</li>
+                <li><b>S/N</b> linear signal-to-noise power ratio</li>
+                <li><b>C</b> capacity, bits per second</li>
+              </ul>
+              <p class="fx-note">The capacity grows only logarithmically with power but linearly with bandwidth. If SNR is expressed in decibels, convert it first: S/N = 10<sup>SNR<sub>dB</sub>/10</sup>.</p>
+            </div>
+          </div>
+          <p>The formula is a bound, not an algorithm. It says that a rate below C is achievable with suitable coding, and a rate above C is impossible. It does not say which code to use, how much delay is acceptable or how complex the decoder must be. Those are engineering questions that took decades to answer.</p>
+          <p>Two limits are worth remembering. As SNR → 0, capacity → 0; a channel buried in noise cannot carry information. As B → ∞ with fixed signal power, capacity grows without bound but only logarithmically in SNR, because the noise power also grows with bandwidth. This is why simply widening a channel eventually stops helping.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-head"><span class="ex-tag">Worked example 8.2</span><h4>Capacity of a telephone line</h4></div>
+          <div class="example-body">
+            <p>A line has 3 kHz of bandwidth and a 30 dB SNR. Find the Shannon capacity and the number of levels a Nyquist system would need to reach it.</p>
+            <p><b>Convert SNR.</b> 30 dB means S/N = 10³ = 1000.</p>
+            <p><b>Capacity.</b> C = 3000 log₂(1001) = 3000 × 9.967 = 29.9 kbps.</p>
+            <p><b>Levels.</b> The Nyquist formula C = 2B log₂L gives log₂L = C/(2B) = 29,900/6000 = 4.98, so L ≈ 2⁵ = 32 levels. A 32-level modem is theoretically sufficient, but practical modems need coding overhead and operate below the bound.</p>
+            <p><b>Reality check.</b> The classic voiceband modem peaked at 33.6 kbps and 56 kbps downstream, close to this bound. The agreement is not a coincidence: it is Shannon's theorem showing up in a product specification.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-s6">
+        <h2>8.6 Putting the limits together</h2>
+        <div class="prose">
+          <p>A complete link design answers four questions in order. How much bandwidth is available? What SNR can be achieved? How many bits per symbol does that SNR support? What sample rate and bit depth does the source need? The answers constrain one another, and a design that ignores one of them will fail in the field.</p>
+          <p>The Nyquist formula sets an upper bound that depends on levels; Shannon sets an upper bound that depends on SNR. The lower of the two is the real limit. A system that claims to exceed both is either using more bandwidth than specified, more power than specified, or making an error in its arithmetic.</p>
+          <p>Digital transmission also inherits the physical-layer concerns of Module 3: attenuation limits distance, distortion causes intersymbol interference, and noise sets the error rate. Capacity formulas describe the ceiling; implementation quality determines how close a real system gets to it.</p>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-proj">
+        <h2>8.7 Watch sampling and folding</h2>
+        <div class="prose">
+          <p>The projection sweeps the input frequency past the Nyquist frequency and shows the reconstructed alias. The status line reports whether the sampling theorem is satisfied and which frequency appears at the output.</p>
+        </div>
+        <div class="projection" data-projection="sampling">
+          <noscript><div class="live-note"><b>Static version:</b> sampling at f<sub>s</sub> creates spectral copies every f<sub>s</sub>. If f<sub>m</sub> ≤ f<sub>s</sub>/2 the copies stay separate and a low-pass filter recovers the signal; if not, the copies overlap and the high frequencies fold down as aliases.</div></noscript>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-lab">
+        <h2>8.8 Lab — Sampling Scope</h2>
+        <div class="prose">
+          <p>Set the signal frequency and the sampling rate. The lab plots the samples, the reconstructed waveform and the alias, and reports the Nyquist rate, the bit rate and the quantisation step from the same parameters.</p>
+        </div>
+        <div class="lab" data-lab="sampling"></div>
+      </section>
+
+      <section class="lesson-section" id="m8-simple">
+        <h2>8.9 Simpler explain</h2>
+        <div class="simple-panel">
+          <span class="db-label sp-label">Simpler explain</span>
+          <p>Sampling is taking a photograph of a signal at regular intervals. If the signal changes faster than the camera can snap, the photos disagree with reality: a fast wheel appears to spin backwards. That is aliasing.</p>
+          <p>The cure is to sample at least twice as fast as the fastest change in the signal, and to blur out anything faster before sampling. The blurring is done by an analog filter, and it must happen before the camera, not after.</p>
+          <p>Quantisation is rounding each photo to a limited palette. More bits mean more shades and less rounding error. The bit rate is the number of photos per second multiplied by the number of bits per photo.</p>
+          <p>The Nyquist formula tells you the most bits a clean channel can carry. Shannon's formula tells you the most a noisy channel can carry. Real systems live below both ceilings.</p>
+        </div>
+        <div class="depth-block foundation">
+          <span class="db-label">Foundation check</span>
+          <p>A 4 kHz voice signal needs at least 8 kSa/s. A 20 kHz audio signal needs at least 40 kSa/s; the CD standard uses 44.1 kSa/s to leave room for the anti-alias filter. A 1 MHz radio signal needs at least 2 MSa/s, which is why software-defined radios use fast converters.</p>
+        </div>
+        <div class="depth-block depth-deep">
+          <span class="db-label">Deep dive</span>
+          <p>The sampling theorem is a statement about the support of a spectrum, not about the signal's "speed". A signal can change very rapidly and still be bandlimited if its rapid changes are built from frequencies below f<sub>m</sub>. Conversely, a signal that looks slow can contain a tiny high-frequency component that aliases. This is why the theorem is stated in terms of the highest frequency present, not the highest frequency you intended to send.</p>
+        </div>
+        <div class="revision-only">
+          <div class="card card-flat mt-2">
+            <h3>Revision card — module 8</h3>
+            <ul class="small">
+              <li><b>Sampling:</b> f<sub>s</sub> ≥ 2f<sub>m</sub>; T<sub>s</sub> = 1/f<sub>s</sub>.</li>
+              <li><b>Alias:</b> |f − k f<sub>s</sub>| folded into 0…f<sub>s</sub>/2.</li>
+              <li><b>PCM:</b> R<sub>b</sub> = f<sub>s</sub>n; Δ = V<sub>FS</sub>/2<sup>n</sup>; SQNR ≈ 6.02n + 1.76 dB.</li>
+              <li><b>Nyquist:</b> C = 2B log₂L (noiseless).</li>
+              <li><b>Shannon:</b> C = B log₂(1 + S/N) (noisy).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="lesson-section" id="m8-check">
+        <h2>8.10 Checkpoint</h2>
+        <div class="prose"><p>Five questions from this module's Intermediate band. Answer before revealing the solution.</p></div>
+        <div class="checkpoint" data-checkpoint="8"></div>
+      </section>
+    </div>
+
+    <aside class="lesson-toc" aria-label="In this module"></aside>
+  </div>
+</article>
