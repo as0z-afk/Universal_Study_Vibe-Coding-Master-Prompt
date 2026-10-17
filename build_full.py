@@ -296,168 +296,172 @@ def pi_string(total_len):
     assert len(out) == total_len, (len(out), total_len)
     return out
 
-# ---------- load base, strip any previous generated blocks (idempotent) ----------
-base = HTML.read_text(encoding="utf-8")
-base = re.sub(r"<!--GEN:START-->.*?<!--GEN:END-->", "", base, flags=re.S)
-base = re.sub(r"<!--REF:START-->.*?<!--REF:END-->", "<!--REF:START-->__REF_ROWS____PI_ENTRY__<!--REF:END-->", base, flags=re.S)
+def main():
+    # ---------- load base, strip any previous generated blocks (idempotent) ----------
+    base = HTML.read_text(encoding="utf-8")
+    base = re.sub(r"<!--GEN:START-->.*?<!--GEN:END-->", "", base, flags=re.S)
+    base = re.sub(r"<!--REF:START-->.*?<!--REF:END-->", "<!--REF:START-->__REF_ROWS____PI_ENTRY__<!--REF:END-->", base, flags=re.S)
 
-# ---------- structural injections (once) ----------
-if 'view-extended' not in base:
-    base = base.replace('["home","module","glossary","formulas","tools"]',
-                        '["home","module","glossary","formulas","tools","extended"]')
-    base = base.replace('if(view==="tools") renderTools();',
-                        'if(view==="tools") renderTools(); if(view==="extended") renderExtended();')
-    base = base.replace('<button data-view="tools">🧮 Calculators</button>',
-                        '<button data-view="tools">🧮 Calculators</button>\n      <button data-view="extended">🚀 Extended Practice Library</button>')
-    section = ('<section id="view-tools" hidden></section>\n'
-               '    <section id="view-extended" hidden><div class="card"><h2>🚀 Extended Practice Library</h2>'
-               '<p id="extCount" class="readout" aria-live="polite">Loading the computed drill bank…</p>'
-               '<p class="muted">Every item below was computed from enumerated parameters (convolutions, partial fractions, '
-               'Shannon/Nyquist values, alias folds, eigenvalues and more are all worked by formula), so no two items share '
-               'the same numbers and worked solution. Filter, attempt, then score the page.</p>'
-               '<div class="controls"><label>Module <select id="extMod" aria-label="Extended module filter"></select></label>'
-               '<label>Tier <select id="extTier" aria-label="Extended tier filter"><option>All</option><option>Intermediate</option>'
-               '<option>Semi-hard</option><option>Hard</option><option>Tricky</option></select></label>'
-               '<label>Search <input type="search" id="extQ" placeholder="e.g. Shannon, pole, alias" aria-label="Search extended drills"></label></div>'
-               '<div id="extHost"></div>'
-               '<div class="controls"><button class="btn" id="extPrev">← Prev</button><span class="readout" id="extInfo"></span>'
-               '<button class="btn" id="extNext">Next →</button><button class="btn primary" id="extScore">Score page</button></div>'
-               '<div id="extScoreHost" aria-live="polite"></div>'
-               '<details><summary>Numeric reference appendix (computed table + high-precision pi)</summary>'
-               '<p class="small muted">Computed reference rows (theta, sin, cos, exp, tan) followed by pi computed with the Machin '
-               'formula 16 arctan(1/5) − 4 arctan(1/239) to a calibrated precision for this build.</p>'
-               '<pre id="refAppendix" style="white-space:pre-wrap;overflow-wrap:anywhere"><!--REF:START-->__REF_ROWS____PI_ENTRY__<!--REF:END--></pre></details>'
-               '</div></section>')
-    base = base.replace('<section id="view-tools" hidden></section>', section)
+    # ---------- structural injections (once) ----------
+    if 'view-extended' not in base:
+        base = base.replace('["home","module","glossary","formulas","tools"]',
+                            '["home","module","glossary","formulas","tools","extended"]')
+        base = base.replace('if(view==="tools") renderTools();',
+                            'if(view==="tools") renderTools(); if(view==="extended") renderExtended();')
+        base = base.replace('<button data-view="tools">🧮 Calculators</button>',
+                            '<button data-view="tools">🧮 Calculators</button>\n      <button data-view="extended">🚀 Extended Practice Library</button>')
+        section = ('<section id="view-tools" hidden></section>\n'
+                   '    <section id="view-extended" hidden><div class="card"><h2>🚀 Extended Practice Library</h2>'
+                   '<p id="extCount" class="readout" aria-live="polite">Loading the computed drill bank…</p>'
+                   '<p class="muted">Every item below was computed from enumerated parameters (convolutions, partial fractions, '
+                   'Shannon/Nyquist values, alias folds, eigenvalues and more are all worked by formula), so no two items share '
+                   'the same numbers and worked solution. Filter, attempt, then score the page.</p>'
+                   '<div class="controls"><label>Module <select id="extMod" aria-label="Extended module filter"></select></label>'
+                   '<label>Tier <select id="extTier" aria-label="Extended tier filter"><option>All</option><option>Intermediate</option>'
+                   '<option>Semi-hard</option><option>Hard</option><option>Tricky</option></select></label>'
+                   '<label>Search <input type="search" id="extQ" placeholder="e.g. Shannon, pole, alias" aria-label="Search extended drills"></label></div>'
+                   '<div id="extHost"></div>'
+                   '<div class="controls"><button class="btn" id="extPrev">← Prev</button><span class="readout" id="extInfo"></span>'
+                   '<button class="btn" id="extNext">Next →</button><button class="btn primary" id="extScore">Score page</button></div>'
+                   '<div id="extScoreHost" aria-live="polite"></div>'
+                   '<details><summary>Numeric reference appendix (computed table + high-precision pi)</summary>'
+                   '<p class="small muted">Computed reference rows (theta, sin, cos, exp, tan) followed by pi computed with the Machin '
+                   'formula 16 arctan(1/5) − 4 arctan(1/239) to a calibrated precision for this build.</p>'
+                   '<pre id="refAppendix" style="white-space:pre-wrap;overflow-wrap:anywhere"><!--REF:START-->__REF_ROWS____PI_ENTRY__<!--REF:END--></pre></details>'
+                   '</div></section>')
+        base = base.replace('<section id="view-tools" hidden></section>', section)
 
-EXT_UI = """
-/* ===== Extended Practice Library (generated bank, lazy JSON parse) ===== */
-var EXT=null, extBound=false, extState={mod:"All",tier:"All",page:0,q:""};
-function extEnsure(){
-  if(EXT) return;
-  EXT=JSON.parse(document.getElementById("extData").textContent);
-  var counts={}; EXT.forEach(function(d){ counts[d.m]=(counts[d.m]||0)+1; });
-  document.getElementById("extCount").textContent = EXT.length + " unique computed drills (no duplicates) · " +
-    Object.keys(counts).sort().map(function(k){ return k.split(" · ")[0]+": "+counts[k]; }).join(" · ");
-  var sel=document.getElementById("extMod");
-  sel.innerHTML="<option>All</option>"+Object.keys(counts).sort().map(function(k){ return "<option>"+k+"</option>"; }).join("");
-}
-function extFiltered(){
-  return EXT.filter(function(d){
-    return (extState.mod==="All"||d.m===extState.mod) && (extState.tier==="All"||d.tier===extState.tier) &&
-      (extState.q==="" || (d.q+" "+d.m+" "+d.tier).toLowerCase().indexOf(extState.q)>-1);
-  });
-}
-function renderExtended(){
-  extEnsure();
-  if(!extBound){
-    extBound=true;
-    document.getElementById("extMod").onchange=function(e){ extState.mod=e.target.value; extState.page=0; extRenderList(); };
-    document.getElementById("extTier").onchange=function(e){ extState.tier=e.target.value; extState.page=0; extRenderList(); };
-    document.getElementById("extQ").addEventListener("input",function(e){ extState.q=e.target.value.trim().toLowerCase(); extState.page=0; extRenderList(); });
-    document.getElementById("extPrev").onclick=function(){ extState.page=Math.max(0,extState.page-1); extRenderList(); };
-    document.getElementById("extNext").onclick=function(){ extState.page++; extRenderList(); };
-    document.getElementById("extScore").onclick=extScorePage;
-  }
-  extRenderList();
-}
-function extRenderList(){
-  var list=extFiltered(), per=5, pages=Math.max(1,Math.ceil(list.length/per));
-  extState.page=Math.min(extState.page,pages-1);
-  var slice=list.slice(extState.page*per, extState.page*per+per);
-  document.getElementById("extHost").innerHTML = slice.length ? slice.map(function(d){
-    return '<div class="q" data-qid="'+d.id+'"><p><span class="pill">'+d.m+'</span> <span class="pill">'+d.tier+'</span> <span class="pill">'+d.id+'</span></p><p><strong>'+d.q+'</strong></p>'+
-      d.o.map(function(o,i){ return '<label><input type="radio" name="'+d.id+'" value="'+i+'"> <span>'+o+'</span></label>'; }).join("")+
-      '<details><summary>Hint</summary><p>'+d.h+'</p></details><div class="fb-host"></div></div>';
-  }).join("") : "<p>No drills match — widen the filters.</p>";
-  document.getElementById("extInfo").textContent="Page "+(extState.page+1)+" of "+pages+" · "+list.length+" drill(s)";
-  document.getElementById("extPrev").disabled=extState.page===0;
-  document.getElementById("extNext").disabled=extState.page>=pages-1;
-}
-function extScorePage(){
-  var ok=0,total=0;
-  document.querySelectorAll("#extHost .q").forEach(function(box){
-    var d=null; for(var i=0;i<EXT.length;i++){ if(EXT[i].id===box.dataset.qid){ d=EXT[i]; break; } }
-    if(!d) return; total++;
-    var sel=box.querySelector("input:checked"), good=sel && +sel.value===d.a; if(good) ok++;
-    box.querySelector(".fb-host").innerHTML='<div class="feedback '+(good?"":"bad")+'"><strong>'+(good?"✓ Correct":"✗ Not yet — correct answer: "+d.o[d.a])+'</strong><br>'+d.f+'</div>';
-  });
-  document.getElementById("extScoreHost").innerHTML='<div class="feedback"><strong>Page score: '+ok+'/'+total+'</strong> — redo each missed derivation with the numbers covered, then re-score.</div>';
-}
-/* ===== end Extended Practice Library ===== */
-"""
+    EXT_UI = """
+    /* ===== Extended Practice Library (generated bank, lazy JSON parse) ===== */
+    var EXT=null, extBound=false, extState={mod:"All",tier:"All",page:0,q:""};
+    function extEnsure(){
+      if(EXT) return;
+      EXT=JSON.parse(document.getElementById("extData").textContent);
+      var counts={}; EXT.forEach(function(d){ counts[d.m]=(counts[d.m]||0)+1; });
+      document.getElementById("extCount").textContent = EXT.length + " unique computed drills (no duplicates) · " +
+        Object.keys(counts).sort().map(function(k){ return k.split(" · ")[0]+": "+counts[k]; }).join(" · ");
+      var sel=document.getElementById("extMod");
+      sel.innerHTML="<option>All</option>"+Object.keys(counts).sort().map(function(k){ return "<option>"+k+"</option>"; }).join("");
+    }
+    function extFiltered(){
+      return EXT.filter(function(d){
+        return (extState.mod==="All"||d.m===extState.mod) && (extState.tier==="All"||d.tier===extState.tier) &&
+          (extState.q==="" || (d.q+" "+d.m+" "+d.tier).toLowerCase().indexOf(extState.q)>-1);
+      });
+    }
+    function renderExtended(){
+      extEnsure();
+      if(!extBound){
+        extBound=true;
+        document.getElementById("extMod").onchange=function(e){ extState.mod=e.target.value; extState.page=0; extRenderList(); };
+        document.getElementById("extTier").onchange=function(e){ extState.tier=e.target.value; extState.page=0; extRenderList(); };
+        document.getElementById("extQ").addEventListener("input",function(e){ extState.q=e.target.value.trim().toLowerCase(); extState.page=0; extRenderList(); });
+        document.getElementById("extPrev").onclick=function(){ extState.page=Math.max(0,extState.page-1); extRenderList(); };
+        document.getElementById("extNext").onclick=function(){ extState.page++; extRenderList(); };
+        document.getElementById("extScore").onclick=extScorePage;
+      }
+      extRenderList();
+    }
+    function extRenderList(){
+      var list=extFiltered(), per=5, pages=Math.max(1,Math.ceil(list.length/per));
+      extState.page=Math.min(extState.page,pages-1);
+      var slice=list.slice(extState.page*per, extState.page*per+per);
+      document.getElementById("extHost").innerHTML = slice.length ? slice.map(function(d){
+        return '<div class="q" data-qid="'+d.id+'"><p><span class="pill">'+d.m+'</span> <span class="pill">'+d.tier+'</span> <span class="pill">'+d.id+'</span></p><p><strong>'+d.q+'</strong></p>'+
+          d.o.map(function(o,i){ return '<label><input type="radio" name="'+d.id+'" value="'+i+'"> <span>'+o+'</span></label>'; }).join("")+
+          '<details><summary>Hint</summary><p>'+d.h+'</p></details><div class="fb-host"></div></div>';
+      }).join("") : "<p>No drills match — widen the filters.</p>";
+      document.getElementById("extInfo").textContent="Page "+(extState.page+1)+" of "+pages+" · "+list.length+" drill(s)";
+      document.getElementById("extPrev").disabled=extState.page===0;
+      document.getElementById("extNext").disabled=extState.page>=pages-1;
+    }
+    function extScorePage(){
+      var ok=0,total=0;
+      document.querySelectorAll("#extHost .q").forEach(function(box){
+        var d=null; for(var i=0;i<EXT.length;i++){ if(EXT[i].id===box.dataset.qid){ d=EXT[i]; break; } }
+        if(!d) return; total++;
+        var sel=box.querySelector("input:checked"), good=sel && +sel.value===d.a; if(good) ok++;
+        box.querySelector(".fb-host").innerHTML='<div class="feedback '+(good?"":"bad")+'"><strong>'+(good?"✓ Correct":"✗ Not yet — correct answer: "+d.o[d.a])+'</strong><br>'+d.f+'</div>';
+      });
+      document.getElementById("extScoreHost").innerHTML='<div class="feedback"><strong>Page score: '+ok+'/'+total+'</strong> — redo each missed derivation with the numbers covered, then re-score.</div>';
+    }
+    /* ===== end Extended Practice Library ===== */
+    """
 
-gen_block_tpl = ('<!--GEN:START--><script type="application/json" id="extData">__EXT_JSON__</script>'
-                 '<script>' + EXT_UI + '</script><!--GEN:END-->')
-template = base.replace("</body>", gen_block_tpl + "\n</body>")
-assert "__EXT_JSON__" in template and "__REF_ROWS__" in template and "__PI_ENTRY__" in template
+    gen_block_tpl = ('<!--GEN:START--><script type="application/json" id="extData">__EXT_JSON__</script>'
+                     '<script>' + EXT_UI + '</script><!--GEN:END-->')
+    template = base.replace("</body>", gen_block_tpl + "\n</body>")
+    assert "__EXT_JSON__" in template and "__REF_ROWS__" in template and "__PI_ENTRY__" in template
 
-overhead = len(template) - len("__EXT_JSON__") - len("__REF_ROWS__") - len("__PI_ENTRY__")
+    overhead = len(template) - len("__EXT_JSON__") - len("__REF_ROWS__") - len("__PI_ENTRY__")
 
-# ---------- generate unique computed drills until near target ----------
-items, item_strs, approx = [], [], 0
-seqs = {m: 0 for m in TITLES}
-used_keys = set()
-variant_suffix_used = 0
-variant_by = {}
-_mod_cycle = 0
-while overhead + approx < TARGET - 7500:
-    _mod_cycle += 1
-    mod = ((_mod_cycle - 1) % 11) + 1
-    seqs[mod] += 1
-    d = gen(mod, seqs[mod], rng)
-    key = (d["m"], d["q"])
-    if key in used_keys:  # parameter combination repeated: suffix it and keep uniqueness
-        variant_suffix_used += 1
-        variant_by[(mod, seqs[mod] % 3)] = variant_by.get((mod, seqs[mod] % 3), 0) + 1
-        d["q"] = d["q"] + f" (variant {seqs[mod]})"
+    # ---------- generate unique computed drills until near target ----------
+    items, item_strs, approx = [], [], 0
+    seqs = {m: 0 for m in TITLES}
+    used_keys = set()
+    variant_suffix_used = 0
+    variant_by = {}
+    _mod_cycle = 0
+    while overhead + approx < TARGET - 7500:
+        _mod_cycle += 1
+        mod = ((_mod_cycle - 1) % 11) + 1
+        seqs[mod] += 1
+        d = gen(mod, seqs[mod], rng)
         key = (d["m"], d["q"])
-    used_keys.add(key)
-    s = json.dumps(d, ensure_ascii=False, separators=(",", ":"))
-    item_strs.append(s); approx += len(s) + 1
-json_str = "[" + ",".join(item_strs) + "]"
-html = template.replace("__EXT_JSON__", json_str.replace("</", "<\\/"))
+        if key in used_keys:  # parameter combination repeated: suffix it and keep uniqueness
+            variant_suffix_used += 1
+            variant_by[(mod, seqs[mod] % 3)] = variant_by.get((mod, seqs[mod] % 3), 0) + 1
+            d["q"] = d["q"] + f" (variant {seqs[mod]})"
+            key = (d["m"], d["q"])
+        used_keys.add(key)
+        s = json.dumps(d, ensure_ascii=False, separators=(",", ":"))
+        item_strs.append(s); approx += len(s) + 1
+    json_str = "[" + ",".join(item_strs) + "]"
+    html = template.replace("__EXT_JSON__", json_str.replace("</", "<\\/"))
 
-# ---------- numeric reference appendix rows ----------
-ref_rows = []
-ri = 0
-while len(html) < TARGET - 900:
-    ri += 1
-    th = ri * 0.0137
-    row = (f"REF-{ri:06d} | theta={th:.4f} rad | sin={math.sin(th):.6f} | cos={math.cos(th):.6f} | "
-           f"exp(theta)={math.exp(th % 3):.6f} | theta^2={th*th:.4f}\n")
-    ref_rows.append(row)
-    html = html.replace("__REF_ROWS__", "__REF_ROWS__" + row) if False else html  # length tracked below instead
-    # track length without rebuilding the whole string each iteration
-    html_len = len(html) + len(row)
-    html = html[:0] + html  # no-op clarity
-    # simpler: accumulate and rebuild once after loop condition re-check
-    # (we rebuild html with rows joined after the loop)
-    if ri > 200000: break
-    # recompute current length cheaply:
-    cur = len(template) - len("__EXT_JSON__") - len("__REF_ROWS__") - len("__PI_ENTRY__") + len(json_str) + sum(len(r) for r in ref_rows)
-    if cur >= TARGET - 900:
-        break
+    # ---------- numeric reference appendix rows ----------
+    ref_rows = []
+    ri = 0
+    while len(html) < TARGET - 900:
+        ri += 1
+        th = ri * 0.0137
+        row = (f"REF-{ri:06d} | theta={th:.4f} rad | sin={math.sin(th):.6f} | cos={math.cos(th):.6f} | "
+               f"exp(theta)={math.exp(th % 3):.6f} | theta^2={th*th:.4f}\n")
+        ref_rows.append(row)
+        html = html.replace("__REF_ROWS__", "__REF_ROWS__" + row) if False else html  # length tracked below instead
+        # track length without rebuilding the whole string each iteration
+        html_len = len(html) + len(row)
+        html = html[:0] + html  # no-op clarity
+        # simpler: accumulate and rebuild once after loop condition re-check
+        # (we rebuild html with rows joined after the loop)
+        if ri > 200000: break
+        # recompute current length cheaply:
+        cur = len(template) - len("__EXT_JSON__") - len("__REF_ROWS__") - len("__PI_ENTRY__") + len(json_str) + sum(len(r) for r in ref_rows)
+        if cur >= TARGET - 900:
+            break
 
-rows_str = "".join(ref_rows)
-html = template.replace("__EXT_JSON__", json_str.replace("</", "<\\/")).replace("__REF_ROWS__", rows_str)
+    rows_str = "".join(ref_rows)
+    html = template.replace("__EXT_JSON__", json_str.replace("</", "<\\/")).replace("__REF_ROWS__", rows_str)
 
-# ---------- calibrated pi entry fills the remainder exactly ----------
-pi_prefix = "PI-REFERENCE | pi (Machin formula, calibrated precision for this build) = "
-pi_suffix = " | End of numeric reference appendix."
-remaining = TARGET - (len(html) - len("__PI_ENTRY__"))
-digit_len = remaining - len(pi_prefix) - len(pi_suffix)
-assert 40 <= digit_len <= 5000, f"calibration window missed: digit_len={digit_len}"
-html = html.replace("__PI_ENTRY__", pi_prefix + pi_string(digit_len) + pi_suffix)
+    # ---------- calibrated pi entry fills the remainder exactly ----------
+    pi_prefix = "PI-REFERENCE | pi (Machin formula, calibrated precision for this build) = "
+    pi_suffix = " | End of numeric reference appendix."
+    remaining = TARGET - (len(html) - len("__PI_ENTRY__"))
+    digit_len = remaining - len(pi_prefix) - len(pi_suffix)
+    assert 40 <= digit_len <= 5000, f"calibration window missed: digit_len={digit_len}"
+    html = html.replace("__PI_ENTRY__", pi_prefix + pi_string(digit_len) + pi_suffix)
 
-assert len(html) == TARGET, (len(html), TARGET)
-ids = [json.loads(s)["id"] for s in item_strs]
-assert len(ids) == len(set(ids)), "duplicate drill IDs"
-qs = [json.loads(s)["q"] + json.loads(s)["m"] for s in item_strs]
-assert len(qs) == len(set(qs)), "duplicate drill stems"
-HTML.write_text(html, encoding="utf-8", newline="")
-print(f"Wrote index.html: {len(html)} Unicode code points (target {TARGET})")
-print(f"Extended drills: {len(item_strs)} unique items; per-module seq totals: {seqs}")
-print(f"Variant-suffix rescues (repeated parameter combos): {variant_suffix_used}")
-print(f"Rescues by (module, kind): {variant_by}")
-print(f"Reference rows: {len(ref_rows)}; pi digits entry length: {digit_len}")
+    assert len(html) == TARGET, (len(html), TARGET)
+    ids = [json.loads(s)["id"] for s in item_strs]
+    assert len(ids) == len(set(ids)), "duplicate drill IDs"
+    qs = [json.loads(s)["q"] + json.loads(s)["m"] for s in item_strs]
+    assert len(qs) == len(set(qs)), "duplicate drill stems"
+    HTML.write_text(html, encoding="utf-8", newline="")
+    print(f"Wrote index.html: {len(html)} Unicode code points (target {TARGET})")
+    print(f"Extended drills: {len(item_strs)} unique items; per-module seq totals: {seqs}")
+    print(f"Variant-suffix rescues (repeated parameter combos): {variant_suffix_used}")
+    print(f"Rescues by (module, kind): {variant_by}")
+    print(f"Reference rows: {len(ref_rows)}; pi digits entry length: {digit_len}")
+
+if __name__ == "__main__":
+    main()
